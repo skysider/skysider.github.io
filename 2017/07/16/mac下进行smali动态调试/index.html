@@ -102,20 +102,19 @@
 
 
 
-  <meta name="description" content="skysider, 安全研究员，主要从事二进制安全相关研究">
-<meta property="og:type" content="website">
-<meta property="og:title" content="about">
-<meta property="og:url" content="https://skysider.github.io/about/index.html">
+  <meta name="description" content="第一种方法（jeb） 在模拟器或者真机中安装并运行apk 以调试模式启动应用 12adb shell dumpsys activity top | head // 获取package name和activity nameadb shell am start -D -n packagename/.activityname  在jeb中设置断点，点击debug，选择设备和对应的调试进程   第二种方法">
+<meta name="keywords" content="调试,android,smali">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mac下进行smali动态调试">
+<meta property="og:url" content="https://skysider.github.io/2017/07/16/mac下进行smali动态调试/index.html">
 <meta property="og:site_name" content="skysider&#39;s blog">
-<meta property="og:description" content="skysider, 安全研究员，主要从事二进制安全相关研究">
+<meta property="og:description" content="第一种方法（jeb） 在模拟器或者真机中安装并运行apk 以调试模式启动应用 12adb shell dumpsys activity top | head // 获取package name和activity nameadb shell am start -D -n packagename/.activityname  在jeb中设置断点，点击debug，选择设备和对应的调试进程   第二种方法">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-05-11T18:12:37.781Z">
+<meta property="og:updated_time" content="2018-05-12T03:56:55.345Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="about">
-<meta name="twitter:description" content="skysider, 安全研究员，主要从事二进制安全相关研究">
+<meta name="twitter:title" content="mac下进行smali动态调试">
+<meta name="twitter:description" content="第一种方法（jeb） 在模拟器或者真机中安装并运行apk 以调试模式启动应用 12adb shell dumpsys activity top | head // 获取package name和activity nameadb shell am start -D -n packagename/.activityname  在jeb中设置断点，点击debug，选择设备和对应的调试进程   第二种方法">
 
-
-  
 
 
   <link rel="alternate" href="/atom.xml" title="skysider's blog" type="application/atom+xml" />
@@ -123,7 +122,7 @@
 
 
 
-  <link rel="canonical" href="https://skysider.github.io/about/"/>
+  <link rel="canonical" href="https://skysider.github.io/2017/07/16/mac下进行smali动态调试/"/>
 
 
 
@@ -133,7 +132,7 @@
   };
 </script>
 
-  <title>about | skysider's blog</title>
+  <title>mac下进行smali动态调试 | skysider's blog</title>
   
 
 
@@ -244,7 +243,7 @@
         
         
           
-          <li class="menu-item menu-item-about menu-item-active">
+          <li class="menu-item menu-item-about">
     <a href="/about/" rel="section">
       <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
   </li>
@@ -308,74 +307,267 @@
           
             
 
-    
-    
-      
-      
-    
-      
-      
-    
-      
-      
-    
-      
-      
-    
-    
-
-  
-
-
           
           <div id="content" class="content">
             
 
   <div id="posts" class="posts-expand">
     
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://skysider.github.io/2017/07/16/mac下进行smali动态调试/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Skysider">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avator.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="skysider's blog">
+    </span>
+
     
-    
-    <div class="post-block page">
       <header class="post-header">
 
-<h1 class="post-title" itemprop="name headline">about</h1>
-
-<div class="post-meta">
-  
-  
-
-
-
-</div>
-
-</header>
-
-      
-      
-      
-      <div class="post-body">
         
         
-          <p>skysider, 安全研究员，主要从事二进制安全相关研究</p>
-
+          <h1 class="post-title" itemprop="name headline">mac下进行smali动态调试
+              
+            
+          </h1>
         
-      </div>
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: Jul 16, 2017 14:36:35" itemprop="dateCreated datePublished" datetime="2017-07-16T14:36:35+08:00">Jul 16, 2017</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: May 12, 2018 11:56:55" itemprop="dateModified" datetime="2018-05-12T11:56:55+08:00">May 12, 2018</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/逆向/" itemprop="url" rel="index"><span itemprop="name">逆向</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/07/16/mac下进行smali动态调试/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/07/16/mac下进行smali动态调试/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
       
       
+
+      
+        <h3 id="第一种方法jeb"><a href="#第一种方法（jeb）" class="headerlink" title="第一种方法（jeb）"></a>第一种方法（jeb）</h3><ol>
+<li>在模拟器或者真机中安装并运行apk</li>
+<li><p>以调试模式启动应用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">adb shell dumpsys activity top | head // 获取package name和activity name</span><br><span class="line">adb shell am start -D -n packagename/.activityname</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在jeb中设置断点，点击debug，选择设备和对应的调试进程</p>
+</li>
+</ol>
+<h3 id="第二种方法android-studio-smalidea"><a href="#第二种方法（Android-Studio-Smalidea）" class="headerlink" title="第二种方法（Android Studio + Smalidea）"></a>第二种方法（Android Studio + Smalidea）</h3><ol>
+<li>使用apktool或者Android Crack Tool解包apk</li>
+<li>将解包的工程导入到Android Studio中</li>
+<li><p>以调试模式启动应用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">adb shell am start -D -n packagename/.MainActivity</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>启动monitor，选中调试应用，开启8700端口</p>
+</li>
+<li>在smali中设置断点，并且设置远程调试（Run-&gt;Edit Configurations-&gt; + -&gt; remote，设置端口为8700），点击debug</li>
+</ol>
+
       
     </div>
+
     
+
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>Skysider</li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="https://skysider.github.io/2017/07/16/mac下进行smali动态调试/" title="mac下进行smali动态调试">https://skysider.github.io/2017/07/16/mac下进行smali动态调试/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> unless stating additionally.</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/调试/" rel="tag"># 调试</a>
+          
+            <a href="/tags/android/" rel="tag"># android</a>
+          
+            <a href="/tags/smali/" rel="tag"># smali</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/25/x86汇编——jump指令/" rel="next" title="x86汇编——jmp指令">
+                <i class="fa fa-chevron-left"></i> x86汇编——jmp指令
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/07/29/windbg手册/" rel="prev" title="windbg常用命令">
+                windbg常用命令 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
 
 
 
-    
-    
-    
+    <div class="post-spread">
+      
+    </div>
   </div>
 
 
           </div>
           
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    </div>
+
+  
+
+
 
         </div>
         
@@ -396,8 +588,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -553,6 +754,22 @@
       </section>
 
       
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#第一种方法jeb"><span class="nav-text">第一种方法（jeb）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第二种方法android-studio-smalidea"><span class="nav-text">第二种方法（Android Studio + Smalidea）</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
 
       
 
@@ -698,6 +915,23 @@
     <script id="dsq-count-scr" src="https://skysider.disqus.com/count.js" async></script>
   
 
+  
+    <script type="text/javascript">
+      var disqus_config = function () {
+        this.page.url = 'https://skysider.github.io/2017/07/16/mac下进行smali动态调试/';
+        this.page.identifier = '2017/07/16/mac下进行smali动态调试/';
+        this.page.title = 'mac下进行smali动态调试';
+      };
+      function loadComments () {
+        var d = document, s = d.createElement('script');
+        s.src = 'https://skysider.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      }
+      
+        loadComments();
+      
+    </script>
   
 
 

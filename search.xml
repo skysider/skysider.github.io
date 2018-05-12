@@ -27,4 +27,52 @@
         <tag>crypto</tag>
       </tags>
   </entry>
+  <entry>
+    <title><![CDATA[heap exploit tips]]></title>
+    <url>%2F2018%2F04%2F24%2Fheap-exploit-tips%2F</url>
+    <content type="text"><![CDATA[1. comm tips: environ指向的地址 -30*size 为 main函数的返回地址的栈地址 申请分配large chunk时，会进行 malloc_consolidate，清空fastbins表，进行合并 scanf, printf当输入、输出过长时，会调用malloc、free addr(main\_arena)-0x10 = addr(__malloc_hook) malloc、calloc、realloc区别 calloc 在分配后会自动进行清空 当realloc(ptr,size)的size不等于ptr的size时 如果申请size&gt;原来size 如果chunk与top chunk相邻，直接扩展这个chunk到新size大小 如果chunk与top chunk不相邻，相当于free(ptr),malloc(new_size) 如果申请size&lt;原来size 如果相差不足以容得下一个最小chunk(64位下32个字节，32位下16个字节)，则保持不变 如果相差可以容得下一个最小chunk，则切割原chunk为两部分，free掉后一部分 当realloc(ptr,size)的size等于0时，相当于free(ptr) 当realloc(ptr,size)的size等于ptr的size，不进行任何操作 2. Heap exploitunlink attack 条件： 存在堆溢出，可以伪造堆块和控制下一个堆块的头部 存在全局指针ptr指向堆块 方法： 伪造堆块 fd=ptr-size*3 bk=ptr-size*2 unlink成功之后 ptr=ptr-size*3 编辑ptr指向的内容，修改ptr指向got表，再编辑ptr即可overwrite got表 12345678910chunk0 malloc返回的ptr chunk1 malloc返回的ptr| | | |+-----------+---------+----+----+----+----+----+------+------+----+----+------+| | |fake|fake|fake|fake| D | fake | fake | | | || | |prev|size| FD | BK | A | prev | size&amp;| | | || prev_size |size&amp;Flag|size| | | | T | size | flag | | | || | | | | | | A | | | | | || | | | | | | | | | | | |+-----------+---------+----+----+----+----+----+------+------+----+----+------+ |--------new_size--------| fastbin attack house of spirit 伪造chunk，free之后再次申请chunk进行攻击 double free 重复释放同一个chunk，实现类似类型混淆的效果 Arbitrary Alloc 利用：__malloc_hook地址-0x28+5 作为伪造的fd指针（地址错位） 12345678910$2 = (void *(**)(size_t, const void *)) 0x7ff5dd109b10 &lt;__malloc_hook&gt;pwndbg&gt; dqs 0x7ff5dd109b10-0x28+500:0000│ 0x7ff5dd109aed (_IO_wide_data_0+301) ◂— 0xf5dd10826000000001:0008│ 0x7ff5dd109af5 (_IO_wide_data_0+309) ◂— 0x7f02:0010│ 0x7ff5dd109afd ◂— 0xf5dcdcae2000000003:0018│ 0x7ff5dd109b05 (__memalign_hook+5) ◂— 0xf5dcdcaa0000007f04:0020│ 0x7ff5dd109b0d (__realloc_hook+5) ◂— 0x7f05:0028│ 0x7ff5dd109b15 (__malloc_hook+5) ◂— 0x0...07:0038│ 0x7ff5dd109b25 (main_arena+5) ◂— 0xc7604a04a0000000 unsorted bin attack 条件： 能够控制 Unsorted Bin Chunk 的 bk 指针(bk = target_addr - 0x10)。 效果： 实现修改任意地址值为一个较大的数值(unsorte bin地址），例如 global_max_fast，例如_IO_list_all（house of orange) House of Lore（small bin attack） 条件： 能够修改small bin中的bk指针 方法： 修改small bin中的bk指针指向伪造的chunk，同时令fake chunk的fd指针不等于small bin中的最后一个chunk 效果： 任意地址写 House Of Einherjar （small或large bin attack）free时触发 条件： 需要有溢出漏洞可以写物理相邻的高地址的 prev_size 与 PREV_INUSE 部分。 我们需要计算目的 chunk 与 p1 地址之间的差，所以需要泄漏地址。 我们需要在目的 chunk 附近构造相应的 fake chunk，从而绕过 unlink 的检测。 方法： 覆盖相邻到地址的prev_size与PREV_INUSE标志位 效果： 任意地址写 House Of Force (top chunk) 条件： 能够以溢出等方式控制到 top chunk 的 size 域 能够自由地控制堆分配尺寸的大小 方法： 修改top chunk size域为-1，然后分配指定大小的堆块（计算偏移） 效果： 能够在任意地址分配堆块，实现任意地址写 House Of Orange (top chunk + unsorted bin + FILE attack) 条件： 首先需要目标漏洞是堆上的漏洞 不存在free函数或其他释放堆块的函数 方法： 伪造top chunk的size，满足 伪造的size必须要对齐到内存页 size要大于MINSIZE(0x10) size要小于之后申请的chunk size + MINSIZE(0x10) size的prev inuse位必须为1 效果： control the world 参考： https://ctf-wiki.github.io/ctf-wiki/pwn/heap/]]></content>
+      <categories>
+        <category>ctf</category>
+      </categories>
+      <tags>
+        <tag>pwn</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[windbg常用命令]]></title>
+    <url>%2F2017%2F07%2F29%2Fwindbg%E6%89%8B%E5%86%8C%2F</url>
+    <content type="text"><![CDATA[命令介绍windbg支持三种类型的命令，标准命令、元命令和扩展命令。 标准命令提供最基本的调试功能，不区分大小写，如k，g，dt，bp等 元命令提供标准命令没有提供的功能，也内建在调试引擎中，以 “.“ 开头，如.sympath, .reload等 扩展命令用于扩展某一方面的调试功能，实现在动态加载的扩展模块中，以 ! 开头，如 !analyze等（需要将第三方dll文件放到winext目录，使用时先用.load xxx.dll加载，然后使用!xxx使用扩展模块功能） 查看帮助 ? —— 打印出所有标准命令 .help —— 打印出所有元命令 .chain —— 给出一个扩展命令集的链表 !&lt;module_name&gt;.help —— 查看扩展模块帮助 .hh —— 打开windbg的chm帮助文件 断点相关 bp &lt;address&gt; —— 设置软件断点，针对某个地址，例如 bp c87fb320, bp edgehtml!ProcessCSSText，当edgehtml!ProcessCSSText位置发生变化时，断点的位置不变 bu &lt;symbol&gt; ——设置延迟断点，针对符号，例如 bu edgehtml!ProcessCSSText，当符号地址变化时，对应的断点地址也会变化 bm &lt;reg&gt; —— 设置符号断点，支持匹配表达式，例如 bm edgehtml!Process* ba &lt;access&gt; &lt;size&gt; &lt;addr&gt; —— 设置处理器断点，access包括 e（执行）、r（读）、w（写），例如 ba w4 0xcccccccc bl —— 列出所有断点 be &lt;index&gt; —— 激活指定编号断点 bd &lt;index&gt; —— 禁止断点 bc &lt;index&gt; —— 清除断点 读写/搜索内存 !address —— 查看进程的所有内存页属性 !address —summary，显示进程的内存统计信息 !address 7ffd8000 ，查看7ffd8000地址处内存页属性 d &lt;type&gt; &lt;address range&gt; ——根据指定的类型查看存储在某地址中的数据 da —— 显示ASCII字符，每行最多显示48字符，例如 da rip, da rip L4, da rip rip+16 db —— 显示字节值和ASCII字符 dw —— 显示字值（2字节） dd —— 显示双字，默认长度为32 Dwords，dd poi(ebp+4)，poi——解引用指针 dD —— 显示双精度浮点数（8字节），默认 15 个数字 df —— 显示单精度浮点数（4字节），默认 16个数字 dq —— 显示四字值（8字节） du —— 显示Unicode字符串 ds —— 显示ASCII字符串 d&lt;type&gt;s &lt;address range&gt; —— 打印地址上的二进制值，同时搜索符号信息 dds 0xdeafbeaf L20 —— 打印0xdeafbeaf开始的0x20个双字二进制值，并检索符号 dqs 0xdeadbeafdeadbeaf—— 打印0xdeafbeaf开始的16（默认值）个四字二进制值，并检索符号 e &lt;type&gt; &lt;address&gt; &lt;value&gt; —— 修改指定内存中的数据 ea 0x445634 &quot;abc&quot; ——在0x445634地址写入ASCII字符串abc，不包含结束符0 eza 0x445634 &quot;abc&quot; —— 在0x445634地址写入ASCII字符串abc， 包含结束符0 eu 0x445634 “abc” —— 在0x445634地址写入Unicode字符串abc，不包含结束符0 ezu 0x445634 “abc”—— 在0x445634地址写入Unicode字符串abc，包含结束符0 ed nCounter 80 —— 修改变量nCounter的值为80 ew 00007ff9a9ddfc06 cc —— 修改00007ff9`a9ddfc06处的双字节为0x00cc .writemem &lt;file&gt; &lt;address range&gt; —— 将指定内存的内容写入文件中 .writemem D:\\Test\\0041a5e4.bin 0041a5e4 L1000 ，将内存地址处0x0041a5e4后面0x1000长度的内容拷贝存储到D:\Test\0041a5e4.bin中 S \[&lt;options&gt;\] &lt;range&gt; &lt;values&gt; —— 搜索内存 s -w 55230000 L0x100 0x1212 0x2212 ，在起始地址0x55230000之后的0x100个单位内搜索0x1212 0x2212 0x1234系列的起始地址 s -u 52230000 52270000 &quot;web&quot; ， 在55230000和55270000之间搜索Unicode字符串“web” s -d 55230000 L0x100 0xdeadbeaf，在起始地址0x55230000之后的0x100个单位内搜索0xdeadbeaf 读写寄存器 r [[&lt;reg&gt; [= &lt;expr&gt;]]]—— 查看或设置寄存器 r —— 查看所有寄存器值 r eax —— 查看eax值 r rax = rip —— 设置rax的值为rip值 符号加载与查看 .symopt —— 显示所有符号选项 .reload —— 重载符号表 ld * —— 加载模块的符号信息 ld * —— 为所有模块加载符号信息 ld kernel32 —— 为kernel32加载符号信息 x [&lt;*|module&gt;!]&lt;*|symbol&gt; —— 查看符号信息 x *! ，列出所有模块的符号信息 x edgehtml!，列出edgehtml模块的符号信息 x edgehtml!CDOM*，列出edgehtml模块中所有以CDOM开始的符号信息 lm —— 列出所有模块的信息 lmv m ntdll—— 查看ntdll的加载信息（简略） lmvm &lt;module name&gt; —— 查看指定模块的详细信息 !dlls -l—— 按照加载顺序列出所有加载模块 !dlls -c &lt;function_name&gt; —— 查找函数所在模块 ln &lt;addr&gt; —— 查看地址addr处或附近的符号信息 调用堆栈 k &lt;num&gt;—— 显示当前调用堆栈 k 5，显示最近5层函数调用信息 kb 4，打印出前3个函数参数的当前调用堆栈 kD，从当前esp（rsp）开始，向高地址方向搜索符号（等价于 dds esp或dqs rsp） .frame —— 显示当前栈帧 .frame 4 —— 显示编号为n的栈帧 !uniqstack —— 显示所有线程的调用堆栈 查看堆 !heap -s —— 显示进程堆的个数 dt _HEAP 001400000 —— 选取一个堆地址，打印该堆的内存结构 !heap -a 001400000 —— 选取一个堆地址，打印堆结构 调试执行 g——继续执行 gH，强制让调试器返回已经处理了这个异常 gN，强制让调试器返回没有处理这个异常 gu，执行到当前函数完成时停下，遇到ret指令停下 wt —— Trace and watch data， 在函数起始地址处执行该命令，跟踪并打印该函数内部调用过程 ctrl+break —— 暂停正在运行的程序 p —— 单步执行（step over) p 2，单步执行2条指令 pc (step to next call)， 执行到下一个函数调用处停下 pa 7c801b0b ( step to address)，执行到7c801b0b处停下 pt，step到下一条ret指令 t—— 单步步入（step into） tc —— 执行到下一个call指令处停下 ta 7c801b0b，执行到7c801b0b处停下 tb，执行到分支指令处（calls、returns、jumps、loops）停下 tt，trace到下一条ret指令 查看汇编 u —— 反汇编 u ，反汇编当前ip寄存器地址后的8条指令 ub ，反汇编当前ip寄存器地址的前8条指令 u main+0x29 L30，反汇编main+0x29地址的后30条指令 uf CTest::add ，反汇编CTest类的add函数 uf /c main，查看main中的函数调用有哪些 查看数据类型与局部变量 dt —— 打印类型信息 dt ntdll!\_IMAGE\_DOS\_HEADER，打印ntdll中的_IMAGE_DOS_HEADER结构 dt nRet，打印局部变量nRet的类型与值 dt myApp!g\_app，打印myApp进程里全局变量g_app的内存布局 dt WindbgTest!CTest 0x0041f8b4，将0x0041f8d4地址处内容按照模块WindbgTest的CTest结构来解析 dt -b -r3 &lt;structure&gt;，-b 递归显示所有子类型信息，-r指定递归显示深度 dv—— 显示局部变量 诊断 !analyze -v—— 详细显示当前异常信息 !analyze -hang —— 诊断线程调用栈上是否有任何线程阻塞了其他线程 !analyze -f —— 查看异常分析信息，尽管调试器未诊断出异常 进程与线程 !peb —— 格式化输出PEB（Process Environment Block）信息 !teb —— 格式化输出TEB（Thread Environment Block）信息 !tls -1 —— 显示当前线程的所有slot信息 | —— 列出所有调试进程 |N，查看序号为N的调试进程 |Ns，切换序号为N的进程为当前调试进程 ~ —— 列出所有线程 ~*k —— 列出所有线程堆栈信息 ~. —— 查看当前线程 ~0 —— 查看主线程 ~# —— 查看导致当前事件或异常的线程 ~N —— 查看N号线程 ~Ns —— 切换序号为N的线程为当前调试线程 ~Nf —— 冻结序号为N的线程 ~Nu —— 解冻序号为N的线程 ~Nn —— Suspend序号为N的线程 ~Nm —— Resume序号为N的线程 参考： http://www.cnblogs.com/kekec/archive/2012/12/02/2798020.html]]></content>
+      <categories>
+        <category>逆向</category>
+      </categories>
+      <tags>
+        <tag>调试</tag>
+        <tag>windbg</tag>
+        <tag>windows</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[mac下进行smali动态调试]]></title>
+    <url>%2F2017%2F07%2F16%2Fmac%E4%B8%8B%E8%BF%9B%E8%A1%8Csmali%E5%8A%A8%E6%80%81%E8%B0%83%E8%AF%95%2F</url>
+    <content type="text"><![CDATA[第一种方法（jeb） 在模拟器或者真机中安装并运行apk 以调试模式启动应用 12adb shell dumpsys activity top | head // 获取package name和activity nameadb shell am start -D -n packagename/.activityname 在jeb中设置断点，点击debug，选择设备和对应的调试进程 第二种方法（Android Studio + Smalidea） 使用apktool或者Android Crack Tool解包apk 将解包的工程导入到Android Studio中 以调试模式启动应用 1adb shell am start -D -n packagename/.MainActivity 启动monitor，选中调试应用，开启8700端口 在smali中设置断点，并且设置远程调试（Run-&gt;Edit Configurations-&gt; + -&gt; remote，设置端口为8700），点击debug]]></content>
+      <categories>
+        <category>逆向</category>
+      </categories>
+      <tags>
+        <tag>调试</tag>
+        <tag>android</tag>
+        <tag>smali</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[x86汇编——jmp指令]]></title>
+    <url>%2F2017%2F05%2F25%2Fx86%E6%B1%87%E7%BC%96%E2%80%94%E2%80%94jump%E6%8C%87%E4%BB%A4%2F</url>
+    <content type="text"><![CDATA[相对地址跳转 伪代码 机器码 示例 jmp short s eb+offset（1个字节） eb03 ，ebfd jmp near ptr s e9+offset（4个字节） e996000000, e964ffffff 绝对地址跳转 位数 伪代码 机器码 示例 32 push addr; jmp esp; 68+addr(4个字节 )+ffe4 68afbeaddeffe4 64 mov rax, addr; jmp rax; 48b8+addr(8个字节)+ffe0 48b8afbeaddeafbeafdeffe0]]></content>
+      <categories>
+        <category>逆向</category>
+      </categories>
+      <tags>
+        <tag>汇编</tag>
+      </tags>
+  </entry>
 </search>

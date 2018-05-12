@@ -102,20 +102,19 @@
 
 
 
-  <meta name="description" content="skysider, 安全研究员，主要从事二进制安全相关研究">
-<meta property="og:type" content="website">
-<meta property="og:title" content="about">
-<meta property="og:url" content="https://skysider.github.io/about/index.html">
+  <meta name="description" content="命令介绍windbg支持三种类型的命令，标准命令、元命令和扩展命令。 标准命令提供最基本的调试功能，不区分大小写，如k，g，dt，bp等 元命令提供标准命令没有提供的功能，也内建在调试引擎中，以 “.“ 开头，如.sympath, .reload等 扩展命令用于扩展某一方面的调试功能，实现在动态加载的扩展模块中，以 ! 开头，如 !analyze等（需要将第三方dll文件放到winext目录，使用">
+<meta name="keywords" content="调试,windbg,windows">
+<meta property="og:type" content="article">
+<meta property="og:title" content="windbg常用命令">
+<meta property="og:url" content="https://skysider.github.io/2017/07/29/windbg手册/index.html">
 <meta property="og:site_name" content="skysider&#39;s blog">
-<meta property="og:description" content="skysider, 安全研究员，主要从事二进制安全相关研究">
+<meta property="og:description" content="命令介绍windbg支持三种类型的命令，标准命令、元命令和扩展命令。 标准命令提供最基本的调试功能，不区分大小写，如k，g，dt，bp等 元命令提供标准命令没有提供的功能，也内建在调试引擎中，以 “.“ 开头，如.sympath, .reload等 扩展命令用于扩展某一方面的调试功能，实现在动态加载的扩展模块中，以 ! 开头，如 !analyze等（需要将第三方dll文件放到winext目录，使用">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-05-11T18:12:37.781Z">
+<meta property="og:updated_time" content="2018-05-12T03:53:43.331Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="about">
-<meta name="twitter:description" content="skysider, 安全研究员，主要从事二进制安全相关研究">
+<meta name="twitter:title" content="windbg常用命令">
+<meta name="twitter:description" content="命令介绍windbg支持三种类型的命令，标准命令、元命令和扩展命令。 标准命令提供最基本的调试功能，不区分大小写，如k，g，dt，bp等 元命令提供标准命令没有提供的功能，也内建在调试引擎中，以 “.“ 开头，如.sympath, .reload等 扩展命令用于扩展某一方面的调试功能，实现在动态加载的扩展模块中，以 ! 开头，如 !analyze等（需要将第三方dll文件放到winext目录，使用">
 
-
-  
 
 
   <link rel="alternate" href="/atom.xml" title="skysider's blog" type="application/atom+xml" />
@@ -123,7 +122,7 @@
 
 
 
-  <link rel="canonical" href="https://skysider.github.io/about/"/>
+  <link rel="canonical" href="https://skysider.github.io/2017/07/29/windbg手册/"/>
 
 
 
@@ -133,7 +132,7 @@
   };
 </script>
 
-  <title>about | skysider's blog</title>
+  <title>windbg常用命令 | skysider's blog</title>
   
 
 
@@ -244,7 +243,7 @@
         
         
           
-          <li class="menu-item menu-item-about menu-item-active">
+          <li class="menu-item menu-item-about">
     <a href="/about/" rel="section">
       <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
   </li>
@@ -308,69 +307,401 @@
           
             
 
-    
-    
-      
-      
-    
-      
-      
-    
-      
-      
-    
-      
-      
-    
-    
-
-  
-
-
           
           <div id="content" class="content">
             
 
   <div id="posts" class="posts-expand">
     
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://skysider.github.io/2017/07/29/windbg手册/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Skysider">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avator.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="skysider's blog">
+    </span>
+
     
-    
-    <div class="post-block page">
       <header class="post-header">
 
-<h1 class="post-title" itemprop="name headline">about</h1>
-
-<div class="post-meta">
-  
-  
-
-
-
-</div>
-
-</header>
-
-      
-      
-      
-      <div class="post-body">
         
         
-          <p>skysider, 安全研究员，主要从事二进制安全相关研究</p>
-
+          <h1 class="post-title" itemprop="name headline">windbg常用命令
+              
+            
+          </h1>
         
-      </div>
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: Jul 29, 2017 15:41:14" itemprop="dateCreated datePublished" datetime="2017-07-29T15:41:14+08:00">Jul 29, 2017</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: May 12, 2018 11:53:43" itemprop="dateModified" datetime="2018-05-12T11:53:43+08:00">May 12, 2018</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/逆向/" itemprop="url" rel="index"><span itemprop="name">逆向</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
       
       
+
+      
+        <h3 id="命令介绍"><a href="#命令介绍" class="headerlink" title="命令介绍"></a>命令介绍</h3><p>windbg支持三种类型的命令，<strong>标准命令</strong>、<strong>元命令</strong>和<strong>扩展命令</strong>。 标准命令提供最基本的调试功能，不区分大小写，如<code>k</code>，<code>g</code>，<code>dt</code>，<code>bp</code>等 元命令提供标准命令没有提供的功能，也内建在调试引擎中，以 “<strong>.</strong>“ 开头，如<code>.sympath</code>, <code>.reload</code>等 扩展命令用于扩展某一方面的调试功能，实现在动态加载的扩展模块中，以 <strong>!</strong> 开头，如 <code>!analyze</code>等（需要将第三方dll文件放到winext目录，使用时先用<code>.load xxx.dll</code>加载，然后使用<code>!xxx</code>使用扩展模块功能）</p>
+<h3 id="查看帮助"><a href="#查看帮助" class="headerlink" title="查看帮助"></a>查看帮助</h3><ul>
+<li><code>?</code> —— 打印出所有标准命令</li>
+<li><code>.help</code> —— 打印出所有元命令</li>
+<li><code>.chain</code> —— 给出一个扩展命令集的链表</li>
+<li><code>!&lt;module_name&gt;.help</code> —— 查看扩展模块帮助</li>
+<li><code>.hh</code> —— 打开windbg的chm帮助文件</li>
+</ul>
+<h3 id="断点相关"><a href="#断点相关" class="headerlink" title="断点相关"></a>断点相关</h3><ul>
+<li><code>bp &lt;address&gt;</code> —— 设置软件断点，针对某个地址，例如 <code>bp c87fb320</code>, <code>bp edgehtml!ProcessCSSText</code>，当<code>edgehtml!ProcessCSSText</code>位置发生变化时，断点的位置不变</li>
+<li><code>bu &lt;symbol&gt;</code> ——设置延迟断点，针对符号，例如 <code>bu edgehtml!ProcessCSSText</code>，当符号地址变化时，对应的断点地址也会变化</li>
+<li><code>bm &lt;reg&gt;</code> —— 设置符号断点，支持匹配表达式，例如 <code>bm edgehtml!Process*</code></li>
+<li><code>ba &lt;access&gt; &lt;size&gt; &lt;addr&gt;</code> —— 设置处理器断点，access包括 e（执行）、r（读）、w（写），例如 <code>ba w4 0xcccccccc</code></li>
+<li><code>bl</code> —— 列出所有断点</li>
+<li><code>be &lt;index&gt;</code> —— 激活指定编号断点</li>
+<li><code>bd &lt;index&gt;</code> —— 禁止断点</li>
+<li><code>bc &lt;index&gt;</code> —— 清除断点</li>
+</ul>
+<h3 id="读写搜索内存"><a href="#读写-搜索内存" class="headerlink" title="读写/搜索内存"></a>读写/搜索内存</h3><ul>
+<li><code>!address</code> —— 查看进程的所有内存页属性<ul>
+<li><code>!address —summary</code>，显示进程的内存统计信息</li>
+<li><code>!address 7ffd8000</code> ，查看7ffd8000地址处内存页属性</li>
+</ul>
+</li>
+<li><code>d &lt;type&gt; &lt;address range&gt;</code> ——根据指定的类型查看存储在某地址中的数据<ul>
+<li><code>da</code> —— 显示ASCII字符，每行最多显示48字符，例如 <code>da rip</code>, <code>da rip L4</code>, <code>da rip rip+16</code></li>
+<li><code>db</code> —— 显示字节值和ASCII字符</li>
+<li><code>dw</code> —— 显示字值（2字节）</li>
+<li><code>dd</code> —— 显示双字，默认长度为32 Dwords，<code>dd poi(ebp+4)</code>，poi——解引用指针</li>
+<li><code>dD</code> —— 显示双精度浮点数（8字节），默认 15 个数字</li>
+<li><code>df</code> —— 显示单精度浮点数（4字节），默认 16个数字</li>
+<li><code>dq</code> —— 显示四字值（8字节）</li>
+<li><code>du</code> —— 显示Unicode字符串</li>
+<li><code>ds</code> —— 显示ASCII字符串</li>
+</ul>
+</li>
+<li><code>d&lt;type&gt;s &lt;address range&gt;</code> —— 打印地址上的二进制值，同时搜索符号信息<ul>
+<li><code>dds 0xdeafbeaf L20</code> —— 打印0xdeafbeaf开始的0x20个双字二进制值，并检索符号</li>
+<li><code>dqs 0xdeadbeafdeadbeaf</code>—— 打印0xdeafbeaf开始的16（默认值）个四字二进制值，并检索符号</li>
+</ul>
+</li>
+<li><code>e &lt;type&gt; &lt;address&gt; &lt;value&gt;</code> —— 修改指定内存中的数据<ul>
+<li><code>ea 0x445634 &quot;abc&quot;</code> ——在0x445634地址写入ASCII字符串abc，不包含结束符0</li>
+<li><code>eza 0x445634 &quot;abc&quot;</code> —— 在0x445634地址写入ASCII字符串abc， 包含结束符0</li>
+<li><code>eu 0x445634 “abc”</code> —— 在0x445634地址写入Unicode字符串abc，不包含结束符0</li>
+<li><code>ezu 0x445634 “abc”</code>—— 在0x445634地址写入Unicode字符串abc，包含结束符0</li>
+<li><code>ed nCounter 80</code> —— 修改变量nCounter的值为80</li>
+<li><code>ew 00007ff9a9ddfc06 cc</code> —— 修改00007ff9`a9ddfc06处的双字节为0x00cc</li>
+</ul>
+</li>
+<li><code>.writemem &lt;file&gt; &lt;address range&gt;</code> —— 将指定内存的内容写入文件中<ul>
+<li><code>.writemem D:\\Test\\0041a5e4.bin 0041a5e4 L1000</code> ，将内存地址处0x0041a5e4后面0x1000长度的内容拷贝存储到D:\Test\0041a5e4.bin中</li>
+</ul>
+</li>
+<li><code>S  \[&lt;options&gt;\] &lt;range&gt; &lt;values&gt;</code> —— 搜索内存<ul>
+<li><code>s -w 55230000 L0x100 0x1212 0x2212</code> ，在起始地址0x55230000之后的0x100个单位内搜索0x1212 0x2212 0x1234系列的起始地址</li>
+<li><code>s -u 52230000 52270000 &quot;web&quot;</code> ， 在55230000和55270000之间搜索Unicode字符串“web”</li>
+<li><code>s -d 55230000 L0x100 0xdeadbeaf</code>，在起始地址0x55230000之后的0x100个单位内搜索0xdeadbeaf</li>
+</ul>
+</li>
+</ul>
+<h3 id="读写寄存器"><a href="#读写寄存器" class="headerlink" title="读写寄存器"></a>读写寄存器</h3><ul>
+<li><code>r [[&lt;reg&gt; [= &lt;expr&gt;]]]</code>—— 查看或设置寄存器<ul>
+<li><code>r</code> —— 查看所有寄存器值</li>
+<li><code>r eax</code> —— 查看eax值</li>
+<li><code>r rax = rip</code> —— 设置rax的值为rip值</li>
+</ul>
+</li>
+</ul>
+<h3 id="符号加载与查看"><a href="#符号加载与查看" class="headerlink" title="符号加载与查看"></a>符号加载与查看</h3><ul>
+<li><code>.symopt</code> —— 显示所有符号选项</li>
+<li><code>.reload</code> —— 重载符号表</li>
+<li><code>ld *</code> —— 加载模块的符号信息<ul>
+<li><code>ld *</code>  —— 为所有模块加载符号信息</li>
+<li><code>ld kernel32</code> —— 为kernel32加载符号信息</li>
+</ul>
+</li>
+<li><code>x [&lt;*|module&gt;!]&lt;*|symbol&gt;</code> —— 查看符号信息<ul>
+<li><code>x *!</code> ，列出所有模块的符号信息</li>
+<li><code>x edgehtml!</code>，列出edgehtml模块的符号信息</li>
+<li><code>x edgehtml!CDOM*</code>，列出edgehtml模块中所有以CDOM开始的符号信息</li>
+</ul>
+</li>
+<li><code>lm</code> —— 列出所有模块的信息</li>
+<li><code>lmv m ntdll</code>—— 查看ntdll的加载信息（简略）</li>
+<li><code>lmvm &lt;module name&gt;</code> —— 查看指定模块的详细信息</li>
+<li><code>!dlls -l</code>—— 按照加载顺序列出所有加载模块</li>
+<li><code>!dlls -c &lt;function_name&gt;</code> —— 查找函数所在模块</li>
+<li><code>ln &lt;addr&gt;</code> —— 查看地址addr处或附近的符号信息</li>
+</ul>
+<h3 id="调用堆栈"><a href="#调用堆栈" class="headerlink" title="调用堆栈"></a>调用堆栈</h3><ul>
+<li><code>k &lt;num&gt;</code>—— 显示当前调用堆栈<ul>
+<li><code>k 5</code>，显示最近5层函数调用信息</li>
+<li><code>kb 4</code>，打印出前3个函数参数的当前调用堆栈</li>
+<li><code>kD</code>，从当前esp（rsp）开始，向高地址方向搜索符号（等价于 dds esp或dqs rsp）</li>
+</ul>
+</li>
+<li><code>.frame</code> —— 显示当前栈帧<ul>
+<li><code>.frame 4</code> —— 显示编号为n的栈帧</li>
+</ul>
+</li>
+<li><code>!uniqstack</code> —— 显示所有线程的调用堆栈</li>
+</ul>
+<h3 id="查看堆"><a href="#查看堆" class="headerlink" title="查看堆"></a>查看堆</h3><ul>
+<li><code>!heap -s</code> —— 显示进程堆的个数</li>
+<li><code>dt _HEAP 001400000</code>  —— 选取一个堆地址，打印该堆的内存结构</li>
+<li><code>!heap -a 001400000</code> —— 选取一个堆地址，打印堆结构</li>
+</ul>
+<h3 id="调试执行"><a href="#调试执行" class="headerlink" title="调试执行"></a>调试执行</h3><ul>
+<li><code>g</code>——继续执行<ul>
+<li><code>gH</code>，强制让调试器返回已经处理了这个异常</li>
+<li><code>gN</code>，强制让调试器返回没有处理这个异常</li>
+<li><code>gu</code>，执行到当前函数完成时停下，遇到ret指令停下</li>
+</ul>
+</li>
+<li><code>wt</code> —— Trace and watch data， 在函数起始地址处执行该命令，跟踪并打印该函数内部调用过程</li>
+<li><code>ctrl+break</code> —— 暂停正在运行的程序</li>
+<li><code>p</code> —— 单步执行（step over)<ul>
+<li><code>p 2</code>，单步执行2条指令</li>
+<li><code>pc</code> (step to next call)， 执行到下一个函数调用处停下</li>
+<li><code>pa 7c801b0b</code> ( step to address)，执行到7c801b0b处停下</li>
+<li><code>pt</code>，step到下一条ret指令</li>
+</ul>
+</li>
+<li><code>t</code>—— 单步步入（step into）<ul>
+<li><code>tc</code> —— 执行到下一个call指令处停下</li>
+<li><code>ta 7c801b0b</code>，执行到7c801b0b处停下</li>
+<li><code>tb</code>，执行到分支指令处（calls、returns、jumps、loops）停下</li>
+<li><code>tt</code>，trace到下一条ret指令</li>
+</ul>
+</li>
+</ul>
+<h3 id="查看汇编"><a href="#查看汇编" class="headerlink" title="查看汇编"></a>查看汇编</h3><ul>
+<li><code>u</code>  —— 反汇编<ul>
+<li><code>u</code> ，反汇编当前ip寄存器地址后的8条指令</li>
+<li><code>ub</code> ，反汇编当前ip寄存器地址的前8条指令</li>
+<li><code>u main+0x29 L30</code>，反汇编main+0x29地址的后30条指令</li>
+<li><code>uf CTest::add</code> ，反汇编CTest类的add函数</li>
+<li><code>uf /c main</code>，查看main中的函数调用有哪些</li>
+</ul>
+</li>
+</ul>
+<h3 id="查看数据类型与局部变量"><a href="#查看数据类型与局部变量" class="headerlink" title="查看数据类型与局部变量"></a>查看数据类型与局部变量</h3><ul>
+<li><code>dt</code> —— 打印类型信息<ul>
+<li><code>dt ntdll!\_IMAGE\_DOS\_HEADER</code>，打印ntdll中的_IMAGE_DOS_HEADER结构</li>
+<li><code>dt nRet</code>，打印局部变量nRet的类型与值</li>
+<li><code>dt myApp!g\_app</code>，打印myApp进程里全局变量g_app的内存布局</li>
+<li><code>dt WindbgTest!CTest 0x0041f8b4</code>，将0x0041f8d4地址处内容按照模块WindbgTest的CTest结构来解析</li>
+<li><code>dt -b -r3 &lt;structure&gt;</code>，-b 递归显示所有子类型信息，-r指定递归显示深度</li>
+</ul>
+</li>
+<li><code>dv</code>—— 显示局部变量</li>
+</ul>
+<h3 id="诊断"><a href="#诊断" class="headerlink" title="诊断"></a>诊断</h3><ul>
+<li><code>!analyze -v</code>—— 详细显示当前异常信息</li>
+<li><code>!analyze -hang</code> —— 诊断线程调用栈上是否有任何线程阻塞了其他线程</li>
+<li><code>!analyze -f</code> —— 查看异常分析信息，尽管调试器未诊断出异常</li>
+</ul>
+<h3 id="进程与线程"><a href="#进程与线程" class="headerlink" title="进程与线程"></a>进程与线程</h3><ul>
+<li><code>!peb</code> —— 格式化输出PEB（Process Environment Block）信息</li>
+<li><code>!teb</code> —— 格式化输出TEB（Thread Environment Block）信息</li>
+<li><code>!tls -1</code> —— 显示当前线程的所有slot信息</li>
+<li><code>|</code> —— 列出所有调试进程<ul>
+<li><code>|N</code>，查看序号为N的调试进程</li>
+<li><code>|Ns</code>，切换序号为N的进程为当前调试进程</li>
+</ul>
+</li>
+<li><code>~</code> —— 列出所有线程<ul>
+<li><code>~*k</code> —— 列出所有线程堆栈信息</li>
+<li><code>~.</code> —— 查看当前线程</li>
+<li><code>~0</code> —— 查看主线程</li>
+<li><code>~#</code>  —— 查看导致当前事件或异常的线程</li>
+<li><code>~N</code> —— 查看N号线程</li>
+<li><code>~Ns</code> —— 切换序号为N的线程为当前调试线程</li>
+<li><code>~Nf</code> —— 冻结序号为N的线程</li>
+<li><code>~Nu</code> —— 解冻序号为N的线程</li>
+<li><code>~Nn</code> —— Suspend序号为N的线程</li>
+<li><code>~Nm</code> —— Resume序号为N的线程</li>
+</ul>
+</li>
+</ul>
+<h3 id="参考"><a href="#参考：" class="headerlink" title="参考："></a>参考：</h3><ol>
+<li><a href="http://www.cnblogs.com/kekec/archive/2012/12/02/2798020.html" target="_blank" rel="noopener">http://www.cnblogs.com/kekec/archive/2012/12/02/2798020.html</a></li>
+</ol>
+
       
     </div>
+
     
+
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>Skysider</li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="https://skysider.github.io/2017/07/29/windbg手册/" title="windbg常用命令">https://skysider.github.io/2017/07/29/windbg手册/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> unless stating additionally.</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/调试/" rel="tag"># 调试</a>
+          
+            <a href="/tags/windbg/" rel="tag"># windbg</a>
+          
+            <a href="/tags/windows/" rel="tag"># windows</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/07/16/mac下进行smali动态调试/" rel="next" title="mac下进行smali动态调试">
+                <i class="fa fa-chevron-left"></i> mac下进行smali动态调试
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/24/heap-exploit-tips/" rel="prev" title="heap exploit tips">
+                heap exploit tips <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
 
 
 
-    
-    
-    
+    <div class="post-spread">
+      
+    </div>
   </div>
 
 
@@ -396,8 +727,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -552,6 +892,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#命令介绍"><span class="nav-text">命令介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看帮助"><span class="nav-text">查看帮助</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#断点相关"><span class="nav-text">断点相关</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#读写搜索内存"><span class="nav-text">读写/搜索内存</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#读写寄存器"><span class="nav-text">读写寄存器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#符号加载与查看"><span class="nav-text">符号加载与查看</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#调用堆栈"><span class="nav-text">调用堆栈</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看堆"><span class="nav-text">查看堆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#调试执行"><span class="nav-text">调试执行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看汇编"><span class="nav-text">查看汇编</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看数据类型与局部变量"><span class="nav-text">查看数据类型与局部变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#诊断"><span class="nav-text">诊断</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#进程与线程"><span class="nav-text">进程与线程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考"><span class="nav-text">参考：</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       

@@ -80,4 +80,120 @@
     
   </entry>
   
+  <entry>
+    <title>heap exploit tips</title>
+    <link href="https://skysider.github.io/2018/04/24/heap-exploit-tips/"/>
+    <id>https://skysider.github.io/2018/04/24/heap-exploit-tips/</id>
+    <published>2018-04-24T09:12:25.000Z</published>
+    <updated>2018-05-12T03:39:46.105Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="1-comm-tips"><a href="#1-comm-tips" class="headerlink" title="1. comm tips:"></a>1. comm tips:</h3><ul><li><code>environ</code>指向的地址 -30*size 为 <code>main</code>函数的返回地址的栈地址</li><li>申请分配large chunk时，会进行 <code>malloc_consolidate</code>，清空<code>fastbins</code>表，进行合并</li><li><code>scanf</code>, <code>printf</code>当输入、输出过长时，会调用<code>malloc</code>、<code>free</code></li><li>addr(<code>main\_arena</code>)-0x10 = addr(<code>__malloc_hook</code>)</li><li><code>malloc</code>、<code>calloc</code>、<code>realloc</code>区别<ul><li><code>calloc</code> 在分配后会自动进行清空</li><li>当<code>realloc(ptr,size)</code>的size不等于ptr的size时<ul><li>如果申请size&gt;原来size<ul><li>如果chunk与top chunk相邻，直接扩展这个chunk到新size大小</li><li>如果chunk与top chunk不相邻，相当于<code>free(ptr)</code>,<code>malloc(new_size)</code></li></ul></li><li>如果申请size&lt;原来size<ul><li>如果相差不足以容得下一个最小chunk(64位下32个字节，32位下16个字节)，则保持不变</li><li>如果相差可以容得下一个最小chunk，则切割原chunk为两部分，free掉后一部分</li></ul></li></ul></li><li>当<code>realloc(ptr,size)</code>的size等于0时，相当于free(ptr)</li><li>当<code>realloc(ptr,size)</code>的size等于ptr的size，不进行任何操作</li></ul></li></ul><h3 id="2-heap-exploit"><a href="#2-Heap-exploit" class="headerlink" title="2. Heap exploit"></a>2. Heap exploit</h3><h4 id="unlink-attack"><a href="#unlink-attack" class="headerlink" title="unlink attack"></a>unlink attack</h4><ul><li><p>条件：</p><ul><li>存在堆溢出，可以伪造堆块和控制下一个堆块的头部</li><li>存在全局指针ptr指向堆块</li></ul></li><li><p>方法：</p><ul><li>伪造堆块<ul><li>fd=ptr-size*3</li><li>bk=ptr-size*2</li></ul></li><li>unlink成功之后<ul><li>ptr=ptr-size*3</li><li>编辑ptr指向的内容，修改ptr指向got表，再编辑ptr即可overwrite got表</li></ul></li></ul></li><li><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">chunk0                malloc返回的ptr           chunk1        malloc返回的ptr</span><br><span class="line">|                     |                        |             |</span><br><span class="line">+-----------+---------+----+----+----+----+----+------+------+----+----+------+</span><br><span class="line">|           |         |fake|fake|fake|fake| D  | fake | fake |    |    |      |</span><br><span class="line">|           |         |prev|size| FD | BK | A  | prev | size&amp;|    |    |      |</span><br><span class="line">| prev_size |size&amp;Flag|size|    |    |    | T  | size | flag |    |    |      |</span><br><span class="line">|           |         |    |    |    |    | A  |      |      |    |    |      |</span><br><span class="line">|           |         |    |    |    |    |    |      |      |    |    |      |</span><br><span class="line">+-----------+---------+----+----+----+----+----+------+------+----+----+------+</span><br><span class="line">                      |--------new_size--------|</span><br></pre></td></tr></table></figure></li></ul><h4 id="fastbin-attack"><a href="#fastbin-attack" class="headerlink" title="fastbin attack"></a>fastbin attack</h4><ul><li>house of spirit<ul><li>伪造chunk，free之后再次申请chunk进行攻击</li></ul></li><li>double free<ul><li>重复释放同一个chunk，实现类似类型混淆的效果</li><li><img src="https://i.loli.net/2018/05/12/5af65e6796438.png" alt="f86cf21b984d249fae8e07f3758a1643.png"></li></ul></li><li>Arbitrary Alloc<ul><li>利用：<code>__malloc_hook</code>地址-0x28+5 作为伪造的fd指针（地址错位）</li><li><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span>2 = (void *(**)(size_t, const void *)) 0x7ff5dd109b10 &lt;__malloc_hook&gt;</span><br><span class="line"><span class="meta">pwndbg&gt;</span> dqs 0x7ff5dd109b10-0x28+5</span><br><span class="line">00:0000│ 0x7ff5dd109aed (_IO_wide_data_0+301) ◂— 0xf5dd108260000000</span><br><span class="line">01:0008│ 0x7ff5dd109af5 (_IO_wide_data_0+309) ◂— 0x7f</span><br><span class="line">02:0010│ 0x7ff5dd109afd ◂— 0xf5dcdcae20000000</span><br><span class="line">03:0018│ 0x7ff5dd109b05 (__memalign_hook+5) ◂— 0xf5dcdcaa0000007f</span><br><span class="line">04:0020│ 0x7ff5dd109b0d (__realloc_hook+5) ◂— 0x7f</span><br><span class="line">05:0028│ 0x7ff5dd109b15 (__malloc_hook+5) ◂— 0x0</span><br><span class="line">...</span><br><span class="line">07:0038│ 0x7ff5dd109b25 (main_arena+5) ◂— 0xc7604a04a0000000</span><br></pre></td></tr></table></figure></li></ul></li></ul><h4 id="unsorted-bin-attack"><a href="#unsorted-bin-attack" class="headerlink" title="unsorted bin attack"></a>unsorted bin attack</h4><ul><li>条件：<ul><li>能够控制 Unsorted Bin Chunk 的 bk 指针(bk = target_addr - 0x10)。</li></ul></li><li>效果：<ul><li>实现修改任意地址值为一个较大的数值(unsorte bin地址），例如 <code>global_max_fast</code>，例如<code>_IO_list_all</code>（house of orange)</li></ul></li></ul><h4 id="house-of-loresmall-bin-attack"><a href="#House-of-Lore（small-bin-attack）" class="headerlink" title="House of Lore（small bin attack）"></a>House of Lore（small bin attack）</h4><ul><li>条件：<ul><li>能够修改small bin中的bk指针</li></ul></li><li>方法：<ul><li>修改small bin中的bk指针指向伪造的chunk，同时令fake chunk的fd指针不等于small bin中的最后一个chunk</li></ul></li><li>效果：<ul><li>任意地址写</li></ul></li></ul><h4 id="house-of-einherjar-small或large-bin-attackfree时触发"><a href="#House-Of-Einherjar-（small或large-bin-attack）free时触发" class="headerlink" title="House Of Einherjar （small或large bin attack）free时触发"></a>House Of Einherjar （small或large bin attack）free时触发</h4><ul><li>条件：<ul><li>需要有溢出漏洞可以写物理相邻的高地址的 prev_size 与 PREV_INUSE 部分。</li><li>我们需要计算目的 chunk 与 p1 地址之间的差，所以需要泄漏地址。</li><li>我们需要在目的 chunk 附近构造相应的 fake chunk，从而绕过 unlink 的检测。</li></ul></li><li>方法：<ul><li>覆盖相邻到地址的prev_size与PREV_INUSE标志位</li></ul></li><li>效果：<ul><li>任意地址写</li></ul></li></ul><h4 id="house-of-force-top-chunk"><a href="#House-Of-Force-top-chunk" class="headerlink" title="House Of Force (top chunk)"></a>House Of Force (top chunk)</h4><ul><li>条件：<ul><li>能够以溢出等方式控制到 top chunk 的 size 域</li><li>能够自由地控制堆分配尺寸的大小</li></ul></li><li>方法：<ul><li>修改top chunk size域为-1，然后分配指定大小的堆块（计算偏移）</li></ul></li><li>效果：<ul><li>能够在任意地址分配堆块，实现任意地址写</li></ul></li></ul><h4 id="house-of-orange-top-chunk-unsorted-bin-file-attack"><a href="#House-Of-Orange-top-chunk-unsorted-bin-FILE-attack" class="headerlink" title="House Of Orange (top chunk + unsorted bin + FILE attack)"></a>House Of Orange (top chunk + unsorted bin + FILE attack)</h4><ul><li>条件：<ul><li>首先需要目标漏洞是堆上的漏洞</li><li>不存在free函数或其他释放堆块的函数</li></ul></li><li>方法：<ul><li>伪造top chunk的size，满足<ol><li>伪造的size必须要对齐到内存页</li><li>size要大于MINSIZE(0x10)</li><li>size要小于之后申请的chunk size + MINSIZE(0x10)</li><li>size的prev inuse位必须为1</li></ol></li></ul></li><li>效果：<ul><li>control the world</li></ul></li></ul><h3 id="参考"><a href="#参考：" class="headerlink" title="参考："></a>参考：</h3><ul><li><a href="https://ctf-wiki.github.io/ctf-wiki/pwn/heap/" target="_blank" rel="noopener">https://ctf-wiki.github.io/ctf-wiki/pwn/heap/</a></li></ul>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;1-comm-tips&quot;&gt;&lt;a href=&quot;#1-comm-tips&quot; class=&quot;headerlink&quot; title=&quot;1. comm tips:&quot;&gt;&lt;/a&gt;1. comm tips:&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;environ&lt;/code&gt;指向的地
+      
+    
+    </summary>
+    
+      <category term="ctf" scheme="https://skysider.github.io/categories/ctf/"/>
+    
+    
+      <category term="pwn" scheme="https://skysider.github.io/tags/pwn/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>windbg常用命令</title>
+    <link href="https://skysider.github.io/2017/07/29/windbg%E6%89%8B%E5%86%8C/"/>
+    <id>https://skysider.github.io/2017/07/29/windbg手册/</id>
+    <published>2017-07-29T07:41:14.000Z</published>
+    <updated>2018-05-12T03:53:43.331Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="命令介绍"><a href="#命令介绍" class="headerlink" title="命令介绍"></a>命令介绍</h3><p>windbg支持三种类型的命令，<strong>标准命令</strong>、<strong>元命令</strong>和<strong>扩展命令</strong>。 标准命令提供最基本的调试功能，不区分大小写，如<code>k</code>，<code>g</code>，<code>dt</code>，<code>bp</code>等 元命令提供标准命令没有提供的功能，也内建在调试引擎中，以 “<strong>.</strong>“ 开头，如<code>.sympath</code>, <code>.reload</code>等 扩展命令用于扩展某一方面的调试功能，实现在动态加载的扩展模块中，以 <strong>!</strong> 开头，如 <code>!analyze</code>等（需要将第三方dll文件放到winext目录，使用时先用<code>.load xxx.dll</code>加载，然后使用<code>!xxx</code>使用扩展模块功能）</p><h3 id="查看帮助"><a href="#查看帮助" class="headerlink" title="查看帮助"></a>查看帮助</h3><ul><li><code>?</code> —— 打印出所有标准命令</li><li><code>.help</code> —— 打印出所有元命令</li><li><code>.chain</code> —— 给出一个扩展命令集的链表</li><li><code>!&lt;module_name&gt;.help</code> —— 查看扩展模块帮助</li><li><code>.hh</code> —— 打开windbg的chm帮助文件</li></ul><h3 id="断点相关"><a href="#断点相关" class="headerlink" title="断点相关"></a>断点相关</h3><ul><li><code>bp &lt;address&gt;</code> —— 设置软件断点，针对某个地址，例如 <code>bp c87fb320</code>, <code>bp edgehtml!ProcessCSSText</code>，当<code>edgehtml!ProcessCSSText</code>位置发生变化时，断点的位置不变</li><li><code>bu &lt;symbol&gt;</code> ——设置延迟断点，针对符号，例如 <code>bu edgehtml!ProcessCSSText</code>，当符号地址变化时，对应的断点地址也会变化</li><li><code>bm &lt;reg&gt;</code> —— 设置符号断点，支持匹配表达式，例如 <code>bm edgehtml!Process*</code></li><li><code>ba &lt;access&gt; &lt;size&gt; &lt;addr&gt;</code> —— 设置处理器断点，access包括 e（执行）、r（读）、w（写），例如 <code>ba w4 0xcccccccc</code></li><li><code>bl</code> —— 列出所有断点</li><li><code>be &lt;index&gt;</code> —— 激活指定编号断点</li><li><code>bd &lt;index&gt;</code> —— 禁止断点</li><li><code>bc &lt;index&gt;</code> —— 清除断点</li></ul><h3 id="读写搜索内存"><a href="#读写-搜索内存" class="headerlink" title="读写/搜索内存"></a>读写/搜索内存</h3><ul><li><code>!address</code> —— 查看进程的所有内存页属性<ul><li><code>!address —summary</code>，显示进程的内存统计信息</li><li><code>!address 7ffd8000</code> ，查看7ffd8000地址处内存页属性</li></ul></li><li><code>d &lt;type&gt; &lt;address range&gt;</code> ——根据指定的类型查看存储在某地址中的数据<ul><li><code>da</code> —— 显示ASCII字符，每行最多显示48字符，例如 <code>da rip</code>, <code>da rip L4</code>, <code>da rip rip+16</code></li><li><code>db</code> —— 显示字节值和ASCII字符</li><li><code>dw</code> —— 显示字值（2字节）</li><li><code>dd</code> —— 显示双字，默认长度为32 Dwords，<code>dd poi(ebp+4)</code>，poi——解引用指针</li><li><code>dD</code> —— 显示双精度浮点数（8字节），默认 15 个数字</li><li><code>df</code> —— 显示单精度浮点数（4字节），默认 16个数字</li><li><code>dq</code> —— 显示四字值（8字节）</li><li><code>du</code> —— 显示Unicode字符串</li><li><code>ds</code> —— 显示ASCII字符串</li></ul></li><li><code>d&lt;type&gt;s &lt;address range&gt;</code> —— 打印地址上的二进制值，同时搜索符号信息<ul><li><code>dds 0xdeafbeaf L20</code> —— 打印0xdeafbeaf开始的0x20个双字二进制值，并检索符号</li><li><code>dqs 0xdeadbeafdeadbeaf</code>—— 打印0xdeafbeaf开始的16（默认值）个四字二进制值，并检索符号</li></ul></li><li><code>e &lt;type&gt; &lt;address&gt; &lt;value&gt;</code> —— 修改指定内存中的数据<ul><li><code>ea 0x445634 &quot;abc&quot;</code> ——在0x445634地址写入ASCII字符串abc，不包含结束符0</li><li><code>eza 0x445634 &quot;abc&quot;</code> —— 在0x445634地址写入ASCII字符串abc， 包含结束符0</li><li><code>eu 0x445634 “abc”</code> —— 在0x445634地址写入Unicode字符串abc，不包含结束符0</li><li><code>ezu 0x445634 “abc”</code>—— 在0x445634地址写入Unicode字符串abc，包含结束符0</li><li><code>ed nCounter 80</code> —— 修改变量nCounter的值为80</li><li><code>ew 00007ff9a9ddfc06 cc</code> —— 修改00007ff9`a9ddfc06处的双字节为0x00cc</li></ul></li><li><code>.writemem &lt;file&gt; &lt;address range&gt;</code> —— 将指定内存的内容写入文件中<ul><li><code>.writemem D:\\Test\\0041a5e4.bin 0041a5e4 L1000</code> ，将内存地址处0x0041a5e4后面0x1000长度的内容拷贝存储到D:\Test\0041a5e4.bin中</li></ul></li><li><code>S  \[&lt;options&gt;\] &lt;range&gt; &lt;values&gt;</code> —— 搜索内存<ul><li><code>s -w 55230000 L0x100 0x1212 0x2212</code> ，在起始地址0x55230000之后的0x100个单位内搜索0x1212 0x2212 0x1234系列的起始地址</li><li><code>s -u 52230000 52270000 &quot;web&quot;</code> ， 在55230000和55270000之间搜索Unicode字符串“web”</li><li><code>s -d 55230000 L0x100 0xdeadbeaf</code>，在起始地址0x55230000之后的0x100个单位内搜索0xdeadbeaf</li></ul></li></ul><h3 id="读写寄存器"><a href="#读写寄存器" class="headerlink" title="读写寄存器"></a>读写寄存器</h3><ul><li><code>r [[&lt;reg&gt; [= &lt;expr&gt;]]]</code>—— 查看或设置寄存器<ul><li><code>r</code> —— 查看所有寄存器值</li><li><code>r eax</code> —— 查看eax值</li><li><code>r rax = rip</code> —— 设置rax的值为rip值</li></ul></li></ul><h3 id="符号加载与查看"><a href="#符号加载与查看" class="headerlink" title="符号加载与查看"></a>符号加载与查看</h3><ul><li><code>.symopt</code> —— 显示所有符号选项</li><li><code>.reload</code> —— 重载符号表</li><li><code>ld *</code> —— 加载模块的符号信息<ul><li><code>ld *</code>  —— 为所有模块加载符号信息</li><li><code>ld kernel32</code> —— 为kernel32加载符号信息</li></ul></li><li><code>x [&lt;*|module&gt;!]&lt;*|symbol&gt;</code> —— 查看符号信息<ul><li><code>x *!</code> ，列出所有模块的符号信息</li><li><code>x edgehtml!</code>，列出edgehtml模块的符号信息</li><li><code>x edgehtml!CDOM*</code>，列出edgehtml模块中所有以CDOM开始的符号信息</li></ul></li><li><code>lm</code> —— 列出所有模块的信息</li><li><code>lmv m ntdll</code>—— 查看ntdll的加载信息（简略）</li><li><code>lmvm &lt;module name&gt;</code> —— 查看指定模块的详细信息</li><li><code>!dlls -l</code>—— 按照加载顺序列出所有加载模块</li><li><code>!dlls -c &lt;function_name&gt;</code> —— 查找函数所在模块</li><li><code>ln &lt;addr&gt;</code> —— 查看地址addr处或附近的符号信息</li></ul><h3 id="调用堆栈"><a href="#调用堆栈" class="headerlink" title="调用堆栈"></a>调用堆栈</h3><ul><li><code>k &lt;num&gt;</code>—— 显示当前调用堆栈<ul><li><code>k 5</code>，显示最近5层函数调用信息</li><li><code>kb 4</code>，打印出前3个函数参数的当前调用堆栈</li><li><code>kD</code>，从当前esp（rsp）开始，向高地址方向搜索符号（等价于 dds esp或dqs rsp）</li></ul></li><li><code>.frame</code> —— 显示当前栈帧<ul><li><code>.frame 4</code> —— 显示编号为n的栈帧</li></ul></li><li><code>!uniqstack</code> —— 显示所有线程的调用堆栈</li></ul><h3 id="查看堆"><a href="#查看堆" class="headerlink" title="查看堆"></a>查看堆</h3><ul><li><code>!heap -s</code> —— 显示进程堆的个数</li><li><code>dt _HEAP 001400000</code>  —— 选取一个堆地址，打印该堆的内存结构</li><li><code>!heap -a 001400000</code> —— 选取一个堆地址，打印堆结构</li></ul><h3 id="调试执行"><a href="#调试执行" class="headerlink" title="调试执行"></a>调试执行</h3><ul><li><code>g</code>——继续执行<ul><li><code>gH</code>，强制让调试器返回已经处理了这个异常</li><li><code>gN</code>，强制让调试器返回没有处理这个异常</li><li><code>gu</code>，执行到当前函数完成时停下，遇到ret指令停下</li></ul></li><li><code>wt</code> —— Trace and watch data， 在函数起始地址处执行该命令，跟踪并打印该函数内部调用过程</li><li><code>ctrl+break</code> —— 暂停正在运行的程序</li><li><code>p</code> —— 单步执行（step over)<ul><li><code>p 2</code>，单步执行2条指令</li><li><code>pc</code> (step to next call)， 执行到下一个函数调用处停下</li><li><code>pa 7c801b0b</code> ( step to address)，执行到7c801b0b处停下</li><li><code>pt</code>，step到下一条ret指令</li></ul></li><li><code>t</code>—— 单步步入（step into）<ul><li><code>tc</code> —— 执行到下一个call指令处停下</li><li><code>ta 7c801b0b</code>，执行到7c801b0b处停下</li><li><code>tb</code>，执行到分支指令处（calls、returns、jumps、loops）停下</li><li><code>tt</code>，trace到下一条ret指令</li></ul></li></ul><h3 id="查看汇编"><a href="#查看汇编" class="headerlink" title="查看汇编"></a>查看汇编</h3><ul><li><code>u</code>  —— 反汇编<ul><li><code>u</code> ，反汇编当前ip寄存器地址后的8条指令</li><li><code>ub</code> ，反汇编当前ip寄存器地址的前8条指令</li><li><code>u main+0x29 L30</code>，反汇编main+0x29地址的后30条指令</li><li><code>uf CTest::add</code> ，反汇编CTest类的add函数</li><li><code>uf /c main</code>，查看main中的函数调用有哪些</li></ul></li></ul><h3 id="查看数据类型与局部变量"><a href="#查看数据类型与局部变量" class="headerlink" title="查看数据类型与局部变量"></a>查看数据类型与局部变量</h3><ul><li><code>dt</code> —— 打印类型信息<ul><li><code>dt ntdll!\_IMAGE\_DOS\_HEADER</code>，打印ntdll中的_IMAGE_DOS_HEADER结构</li><li><code>dt nRet</code>，打印局部变量nRet的类型与值</li><li><code>dt myApp!g\_app</code>，打印myApp进程里全局变量g_app的内存布局</li><li><code>dt WindbgTest!CTest 0x0041f8b4</code>，将0x0041f8d4地址处内容按照模块WindbgTest的CTest结构来解析</li><li><code>dt -b -r3 &lt;structure&gt;</code>，-b 递归显示所有子类型信息，-r指定递归显示深度</li></ul></li><li><code>dv</code>—— 显示局部变量</li></ul><h3 id="诊断"><a href="#诊断" class="headerlink" title="诊断"></a>诊断</h3><ul><li><code>!analyze -v</code>—— 详细显示当前异常信息</li><li><code>!analyze -hang</code> —— 诊断线程调用栈上是否有任何线程阻塞了其他线程</li><li><code>!analyze -f</code> —— 查看异常分析信息，尽管调试器未诊断出异常</li></ul><h3 id="进程与线程"><a href="#进程与线程" class="headerlink" title="进程与线程"></a>进程与线程</h3><ul><li><code>!peb</code> —— 格式化输出PEB（Process Environment Block）信息</li><li><code>!teb</code> —— 格式化输出TEB（Thread Environment Block）信息</li><li><code>!tls -1</code> —— 显示当前线程的所有slot信息</li><li><code>|</code> —— 列出所有调试进程<ul><li><code>|N</code>，查看序号为N的调试进程</li><li><code>|Ns</code>，切换序号为N的进程为当前调试进程</li></ul></li><li><code>~</code> —— 列出所有线程<ul><li><code>~*k</code> —— 列出所有线程堆栈信息</li><li><code>~.</code> —— 查看当前线程</li><li><code>~0</code> —— 查看主线程</li><li><code>~#</code>  —— 查看导致当前事件或异常的线程</li><li><code>~N</code> —— 查看N号线程</li><li><code>~Ns</code> —— 切换序号为N的线程为当前调试线程</li><li><code>~Nf</code> —— 冻结序号为N的线程</li><li><code>~Nu</code> —— 解冻序号为N的线程</li><li><code>~Nn</code> —— Suspend序号为N的线程</li><li><code>~Nm</code> —— Resume序号为N的线程</li></ul></li></ul><h3 id="参考"><a href="#参考：" class="headerlink" title="参考："></a>参考：</h3><ol><li><a href="http://www.cnblogs.com/kekec/archive/2012/12/02/2798020.html" target="_blank" rel="noopener">http://www.cnblogs.com/kekec/archive/2012/12/02/2798020.html</a></li></ol>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;命令介绍&quot;&gt;&lt;a href=&quot;#命令介绍&quot; class=&quot;headerlink&quot; title=&quot;命令介绍&quot;&gt;&lt;/a&gt;命令介绍&lt;/h3&gt;&lt;p&gt;windbg支持三种类型的命令，&lt;strong&gt;标准命令&lt;/strong&gt;、&lt;strong&gt;元命令&lt;/strong&gt;和&lt;st
+      
+    
+    </summary>
+    
+      <category term="逆向" scheme="https://skysider.github.io/categories/%E9%80%86%E5%90%91/"/>
+    
+    
+      <category term="调试" scheme="https://skysider.github.io/tags/%E8%B0%83%E8%AF%95/"/>
+    
+      <category term="windbg" scheme="https://skysider.github.io/tags/windbg/"/>
+    
+      <category term="windows" scheme="https://skysider.github.io/tags/windows/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>mac下进行smali动态调试</title>
+    <link href="https://skysider.github.io/2017/07/16/mac%E4%B8%8B%E8%BF%9B%E8%A1%8Csmali%E5%8A%A8%E6%80%81%E8%B0%83%E8%AF%95/"/>
+    <id>https://skysider.github.io/2017/07/16/mac下进行smali动态调试/</id>
+    <published>2017-07-16T06:36:35.000Z</published>
+    <updated>2018-05-12T03:56:55.345Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="第一种方法jeb"><a href="#第一种方法（jeb）" class="headerlink" title="第一种方法（jeb）"></a>第一种方法（jeb）</h3><ol><li>在模拟器或者真机中安装并运行apk</li><li><p>以调试模式启动应用</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">adb shell dumpsys activity top | head // 获取package name和activity name</span><br><span class="line">adb shell am start -D -n packagename/.activityname</span><br></pre></td></tr></table></figure></li><li><p>在jeb中设置断点，点击debug，选择设备和对应的调试进程</p></li></ol><h3 id="第二种方法android-studio-smalidea"><a href="#第二种方法（Android-Studio-Smalidea）" class="headerlink" title="第二种方法（Android Studio + Smalidea）"></a>第二种方法（Android Studio + Smalidea）</h3><ol><li>使用apktool或者Android Crack Tool解包apk</li><li>将解包的工程导入到Android Studio中</li><li><p>以调试模式启动应用</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">adb shell am start -D -n packagename/.MainActivity</span><br></pre></td></tr></table></figure></li><li><p>启动monitor，选中调试应用，开启8700端口</p></li><li>在smali中设置断点，并且设置远程调试（Run-&gt;Edit Configurations-&gt; + -&gt; remote，设置端口为8700），点击debug</li></ol>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;第一种方法jeb&quot;&gt;&lt;a href=&quot;#第一种方法（jeb）&quot; class=&quot;headerlink&quot; title=&quot;第一种方法（jeb）&quot;&gt;&lt;/a&gt;第一种方法（jeb）&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;在模拟器或者真机中安装并运行apk&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;以调试模
+      
+    
+    </summary>
+    
+      <category term="逆向" scheme="https://skysider.github.io/categories/%E9%80%86%E5%90%91/"/>
+    
+    
+      <category term="调试" scheme="https://skysider.github.io/tags/%E8%B0%83%E8%AF%95/"/>
+    
+      <category term="android" scheme="https://skysider.github.io/tags/android/"/>
+    
+      <category term="smali" scheme="https://skysider.github.io/tags/smali/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>x86汇编——jmp指令</title>
+    <link href="https://skysider.github.io/2017/05/25/x86%E6%B1%87%E7%BC%96%E2%80%94%E2%80%94jump%E6%8C%87%E4%BB%A4/"/>
+    <id>https://skysider.github.io/2017/05/25/x86汇编——jump指令/</id>
+    <published>2017-05-24T16:19:11.000Z</published>
+    <updated>2018-05-12T04:03:38.073Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="相对地址跳转"><a href="#相对地址跳转" class="headerlink" title="相对地址跳转"></a>相对地址跳转</h3><table><thead><tr><th>伪代码</th><th>机器码</th><th>示例</th></tr></thead><tbody><tr><td>jmp short s</td><td>eb+offset（1个字节）</td><td>eb03 ，ebfd</td></tr><tr><td>jmp near ptr s</td><td>e9+offset（4个字节）</td><td>e996000000, e964ffffff</td></tr></tbody></table><h3 id="绝对地址跳转"><a href="#绝对地址跳转" class="headerlink" title="绝对地址跳转"></a>绝对地址跳转</h3><table><thead><tr><th>位数</th><th>伪代码</th><th>机器码</th><th>示例</th></tr></thead><tbody><tr><td>32</td><td>push addr; jmp esp;</td><td>68+addr(4个字节 )+ffe4</td><td>68afbeaddeffe4</td></tr><tr><td>64</td><td>mov rax, addr; jmp rax;</td><td>48b8+addr(8个字节)+ffe0</td><td>48b8afbeaddeafbeafdeffe0</td></tr></tbody></table>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;相对地址跳转&quot;&gt;&lt;a href=&quot;#相对地址跳转&quot; class=&quot;headerlink&quot; title=&quot;相对地址跳转&quot;&gt;&lt;/a&gt;相对地址跳转&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;伪代码&lt;/th&gt;
+&lt;th&gt;机器码&lt;/th&gt;
+&lt;th&gt;示例&lt;/th
+      
+    
+    </summary>
+    
+      <category term="逆向" scheme="https://skysider.github.io/categories/%E9%80%86%E5%90%91/"/>
+    
+    
+      <category term="汇编" scheme="https://skysider.github.io/tags/%E6%B1%87%E7%BC%96/"/>
+    
+  </entry>
+  
 </feed>
