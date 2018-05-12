@@ -102,16 +102,20 @@
 
 
 
-  <meta name="description" content="Have fun with hacking and developing">
-<meta property="og:type" content="website">
-<meta property="og:title" content="skysider&#39;s blog">
-<meta property="og:url" content="https://skysider.github.io/tags/cve-2018-6789/index.html">
+  <meta name="description" content="在ctf比赛中，有时调试一个pwn题目，发现直到调用system函数、传参时都是对的，但是system函数会执行失败，就是无法拿到shell，在这里总结了一下可能的原因：  在调用system函数时，esp指针指向的区域前面不存在一定空间的可写数据区，原因是在函数执行过程中，会维护自己的栈帧(sub esp, xxxx) —— fake frame时需要注意，会触发__libc_sigaction">
+<meta name="keywords" content="pwn,getshell">
+<meta property="og:type" content="article">
+<meta property="og:title" content="pwn中system调用失败分析">
+<meta property="og:url" content="https://skysider.github.io/2017/04/20/pwn中system调用失败分析/index.html">
 <meta property="og:site_name" content="skysider&#39;s blog">
-<meta property="og:description" content="Have fun with hacking and developing">
+<meta property="og:description" content="在ctf比赛中，有时调试一个pwn题目，发现直到调用system函数、传参时都是对的，但是system函数会执行失败，就是无法拿到shell，在这里总结了一下可能的原因：  在调用system函数时，esp指针指向的区域前面不存在一定空间的可写数据区，原因是在函数执行过程中，会维护自己的栈帧(sub esp, xxxx) —— fake frame时需要注意，会触发__libc_sigaction">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://i.loli.net/2018/05/12/5af6ccf26068d.png">
+<meta property="og:updated_time" content="2018-05-12T11:27:42.406Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="skysider&#39;s blog">
-<meta name="twitter:description" content="Have fun with hacking and developing">
+<meta name="twitter:title" content="pwn中system调用失败分析">
+<meta name="twitter:description" content="在ctf比赛中，有时调试一个pwn题目，发现直到调用system函数、传参时都是对的，但是system函数会执行失败，就是无法拿到shell，在这里总结了一下可能的原因：  在调用system函数时，esp指针指向的区域前面不存在一定空间的可写数据区，原因是在函数执行过程中，会维护自己的栈帧(sub esp, xxxx) —— fake frame时需要注意，会触发__libc_sigaction">
+<meta name="twitter:image" content="https://i.loli.net/2018/05/12/5af6ccf26068d.png">
 
 
 
@@ -120,7 +124,7 @@
 
 
 
-  <link rel="canonical" href="https://skysider.github.io/tags/cve-2018-6789/"/>
+  <link rel="canonical" href="https://skysider.github.io/2017/04/20/pwn中system调用失败分析/"/>
 
 
 
@@ -130,7 +134,7 @@
   };
 </script>
 
-  <title>Tag: cve-2018-6789 | skysider's blog</title>
+  <title>pwn中system调用失败分析 | skysider's blog</title>
   
 
 
@@ -177,7 +181,7 @@
     
   
 
-  <div class="container sidebar-position-left ">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -305,81 +309,259 @@
           
             
 
-    
-    
-      
-      
-    
-      
-      
-    
-      
-      
-    
-      
-      
-    
-    
-
-  
-
-
           
           <div id="content" class="content">
             
 
-  
-  
-  
-  <div class="post-block tag">
+  <div id="posts" class="posts-expand">
+    
 
-    <div id="posts" class="posts-collapse">
-      <div class="collection-title">
-        <h1>cve-2018-6789<small>Tag</small>
-        </h1>
-      </div>
+  
 
-      
-        
+  
+  
+  
+
+  
 
   <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://skysider.github.io/2017/04/20/pwn中system调用失败分析/">
 
-      <h2 class="post-title">
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Skysider">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avator.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="skysider's blog">
+    </span>
+
+    
+      <header class="post-header">
+
         
-            <a class="post-title-link" href="/2018/05/12/Exim-off-by-one-漏洞利用/" itemprop="url">
-              
-                <span itemprop="name">Exim off-by-one 漏洞利用</span>
-              
-            </a>
         
-      </h2>
+          <h1 class="post-title" itemprop="name headline">pwn中system调用失败分析
+              
+            
+          </h1>
+        
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-05-12T01:18:59+08:00"
-              content="May 12, 2018" >
-          05-12
-        </time>
-      </div>
+        <div class="post-meta">
+          <span class="post-time">
 
-    </header>
-  </article>
+            
+            
+            
 
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: Apr 20, 2017 23:44:27" itemprop="dateCreated datePublished" datetime="2017-04-20T23:44:27+08:00">Apr 20, 2017</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: May 12, 2018 19:27:42" itemprop="dateModified" datetime="2018-05-12T19:27:42+08:00">May 12, 2018</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/ctf/" itemprop="url" rel="index"><span itemprop="name">ctf</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/04/20/pwn中system调用失败分析/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/04/20/pwn中system调用失败分析/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在ctf比赛中，有时调试一个pwn题目，发现直到调用system函数、传参时都是对的，但是system函数会执行失败，就是无法拿到shell，在这里总结了一下可能的原因：</p>
+<ol>
+<li>在调用system函数时，esp指针指向的区域前面不存在一定空间的可写数据区，原因是在函数执行过程中，会维护自己的栈帧(sub esp, xxxx) —— fake frame时需要注意，会触发<code>__libc_sigaction</code>错误，fault address<a id="more"></a></li>
+<li><p>system函数的调用流程：system -&gt; do_system-&gt;execve，execve函数执行时，会有三个参数:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">__execve (SHELL_PATH, (char *const *) new_argv, __environ);</span><br></pre></td></tr></table></figure>
+<p>其中，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">SHELL_PATH = &quot;/bin/bash&quot;;</span><br><span class="line">const char *new_argv[4];</span><br><span class="line">new_argv[0] = SHELL_NAME; // &quot;sh&quot;</span><br><span class="line">new_argv[1] = &quot;-c&quot;;</span><br><span class="line">new_argv[2] = line;</span><br><span class="line">new_argv[3] = NULL;</span><br><span class="line"></span><br><span class="line">environ=&quot;HOME=skysider&quot; // or &quot;&quot;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>当environ指向的栈数据被无效数据覆盖时，就会调用失败。因此可以采用gdb动态调试的方法，若发现system函数能够执行到execve函数，可以观察此时execve的几个参数值是否正常，若异常，就可以去寻找对应的原因。</p>
+<p>一种解决的方法是不调用system函数，而是调用execve函数，在调用时指定environ为NULL即可，即 <code>execve(&quot;/bin/sh&quot;, 0, 0)</code> 调试技巧：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">b system</span><br><span class="line">b execve</span><br><span class="line">stack // 查看堆栈数据,SHELL_PATH和environ</span><br><span class="line">x/s *(char**)(*(char **)($esp+8)+8) // 查看 line</span><br></pre></td></tr></table></figure></p>
+<p><img src="https://i.loli.net/2018/05/12/5af6ccf26068d.png" alt="getshell.png"></p>
 
       
     </div>
 
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>Skysider</li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="https://skysider.github.io/2017/04/20/pwn中system调用失败分析/" title="pwn中system调用失败分析">https://skysider.github.io/2017/04/20/pwn中system调用失败分析/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> unless stating additionally.</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/pwn/" rel="tag"># pwn</a>
+          
+            <a href="/tags/getshell/" rel="tag"># getshell</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/21/PwnDocker/" rel="next" title="一个用于CTF PWN的docker容器">
+                <i class="fa fa-chevron-left"></i> 一个用于CTF PWN的docker容器
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/04/20/about-heap/" rel="prev" title="About heap">
+                About heap <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </div>
   
   
   
+  </article>
 
-  
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
           
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    </div>
+
+  
+
+
 
         </div>
         
@@ -688,6 +870,10 @@
 
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.2.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.2.0"></script>
+
+
 
   
 
@@ -702,6 +888,23 @@
     <script id="dsq-count-scr" src="https://skysider.disqus.com/count.js" async></script>
   
 
+  
+    <script type="text/javascript">
+      var disqus_config = function () {
+        this.page.url = 'https://skysider.github.io/2017/04/20/pwn中system调用失败分析/';
+        this.page.identifier = '2017/04/20/pwn中system调用失败分析/';
+        this.page.title = 'pwn中system调用失败分析';
+      };
+      function loadComments () {
+        var d = document, s = d.createElement('script');
+        s.src = 'https://skysider.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      }
+      
+        loadComments();
+      
+    </script>
   
 
 
