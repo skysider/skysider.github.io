@@ -102,18 +102,18 @@
 
 
 
-  <meta name="description" content="第一种方法（jeb） 在模拟器或者真机中安装并运行apk 以调试模式启动应用 12adb shell dumpsys activity top | head // 获取package name和activity nameadb shell am start -D -n packagename/.activityname  在jeb中设置断点，点击debug，选择设备和对应的调试进程   第二种方法">
+  <meta name="description" content="第一种方法（jeb） 在模拟器或者真机中安装并运行apk 以调试模式启动应用  12adb shell dumpsys activity top | head // 获取package name和activity nameadb shell am start -D -n packagename/.activityname  在jeb中设置断点，点击debug，选择设备和对应的调试进程">
 <meta name="keywords" content="调试,android,smali">
 <meta property="og:type" content="article">
 <meta property="og:title" content="mac下进行smali动态调试">
 <meta property="og:url" content="https://skysider.github.io/2017/07/16/mac下进行smali动态调试/index.html">
 <meta property="og:site_name" content="skysider&#39;s blog">
-<meta property="og:description" content="第一种方法（jeb） 在模拟器或者真机中安装并运行apk 以调试模式启动应用 12adb shell dumpsys activity top | head // 获取package name和activity nameadb shell am start -D -n packagename/.activityname  在jeb中设置断点，点击debug，选择设备和对应的调试进程   第二种方法">
+<meta property="og:description" content="第一种方法（jeb） 在模拟器或者真机中安装并运行apk 以调试模式启动应用  12adb shell dumpsys activity top | head // 获取package name和activity nameadb shell am start -D -n packagename/.activityname  在jeb中设置断点，点击debug，选择设备和对应的调试进程">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-05-12T03:56:55.345Z">
+<meta property="og:updated_time" content="2018-05-12T10:29:05.817Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="mac下进行smali动态调试">
-<meta name="twitter:description" content="第一种方法（jeb） 在模拟器或者真机中安装并运行apk 以调试模式启动应用 12adb shell dumpsys activity top | head // 获取package name和activity nameadb shell am start -D -n packagename/.activityname  在jeb中设置断点，点击debug，选择设备和对应的调试进程   第二种方法">
+<meta name="twitter:description" content="第一种方法（jeb） 在模拟器或者真机中安装并运行apk 以调试模式启动应用  12adb shell dumpsys activity top | head // 获取package name和activity nameadb shell am start -D -n packagename/.activityname  在jeb中设置断点，点击debug，选择设备和对应的调试进程">
 
 
 
@@ -386,7 +386,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: May 12, 2018 11:56:55" itemprop="dateModified" datetime="2018-05-12T11:56:55+08:00">May 12, 2018</time>
+                <time title="Modified: May 12, 2018 18:29:05" itemprop="dateModified" datetime="2018-05-12T18:29:05+08:00">May 12, 2018</time>
               
             
           </span>
@@ -450,14 +450,15 @@
       
         <h3 id="第一种方法jeb"><a href="#第一种方法（jeb）" class="headerlink" title="第一种方法（jeb）"></a>第一种方法（jeb）</h3><ol>
 <li>在模拟器或者真机中安装并运行apk</li>
-<li><p>以调试模式启动应用</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">adb shell dumpsys activity top | head // 获取package name和activity name</span><br><span class="line">adb shell am start -D -n packagename/.activityname</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>在jeb中设置断点，点击debug，选择设备和对应的调试进程</p>
-</li>
+<li>以调试模式启动应用</li>
 </ol>
-<h3 id="第二种方法android-studio-smalidea"><a href="#第二种方法（Android-Studio-Smalidea）" class="headerlink" title="第二种方法（Android Studio + Smalidea）"></a>第二种方法（Android Studio + Smalidea）</h3><ol>
-<li>使用apktool或者Android Crack Tool解包apk</li>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">adb shell dumpsys activity top | head // 获取package name和activity name</span><br><span class="line">adb shell am start -D -n packagename/.activityname</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li><p>在jeb中设置断点，点击debug，选择设备和对应的调试进程</p>
+<a id="more"></a>
+<h3 id="第二种方法android-studio-smalidea"><a href="#第二种方法（Android-Studio-Smalidea）" class="headerlink" title="第二种方法（Android Studio + Smalidea）"></a>第二种方法（Android Studio + Smalidea）</h3></li>
+<li><p>使用apktool或者Android Crack Tool解包apk</p>
+</li>
 <li>将解包的工程导入到Android Studio中</li>
 <li><p>以调试模式启动应用</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">adb shell am start -D -n packagename/.MainActivity</span><br></pre></td></tr></table></figure>
@@ -617,7 +618,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-count">7</span>
                     <span class="site-state-item-name">posts</span>
                   </a>
                 </div>

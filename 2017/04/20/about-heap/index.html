@@ -102,16 +102,20 @@
 
 
 
-  <meta name="description" content="Have fun with hacking and developing">
-<meta property="og:type" content="website">
-<meta property="og:title" content="skysider&#39;s blog">
-<meta property="og:url" content="https://skysider.github.io/archives/2018/05/index.html">
+  <meta name="description" content="本文主要介绍ptmalloc3中关键的数据结构以及 malloc、free函数的执行过程。 malloc_state123456789101112131415161718192021222324252627282930313233343536373839struct malloc_state &amp;#123;    /* Serialize access.  */    mutex_t mutex;">
+<meta name="keywords" content="pwn">
+<meta property="og:type" content="article">
+<meta property="og:title" content="About heap">
+<meta property="og:url" content="https://skysider.github.io/2017/04/20/about-heap/index.html">
 <meta property="og:site_name" content="skysider&#39;s blog">
-<meta property="og:description" content="Have fun with hacking and developing">
+<meta property="og:description" content="本文主要介绍ptmalloc3中关键的数据结构以及 malloc、free函数的执行过程。 malloc_state123456789101112131415161718192021222324252627282930313233343536373839struct malloc_state &amp;#123;    /* Serialize access.  */    mutex_t mutex;">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://i.loli.net/2018/05/12/5af6bda1e588a.png">
+<meta property="og:updated_time" content="2018-05-12T10:31:50.150Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="skysider&#39;s blog">
-<meta name="twitter:description" content="Have fun with hacking and developing">
+<meta name="twitter:title" content="About heap">
+<meta name="twitter:description" content="本文主要介绍ptmalloc3中关键的数据结构以及 malloc、free函数的执行过程。 malloc_state123456789101112131415161718192021222324252627282930313233343536373839struct malloc_state &amp;#123;    /* Serialize access.  */    mutex_t mutex;">
+<meta name="twitter:image" content="https://i.loli.net/2018/05/12/5af6bda1e588a.png">
 
 
 
@@ -120,7 +124,7 @@
 
 
 
-  <link rel="canonical" href="https://skysider.github.io/archives/2018/05/"/>
+  <link rel="canonical" href="https://skysider.github.io/2017/04/20/about-heap/"/>
 
 
 
@@ -130,7 +134,7 @@
   };
 </script>
 
-  <title>Archive | skysider's blog</title>
+  <title>About heap | skysider's blog</title>
   
 
 
@@ -177,7 +181,7 @@
     
   
 
-  <div class="container sidebar-position-left page-archive">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -233,7 +237,7 @@
         
         
           
-          <li class="menu-item menu-item-archives menu-item-active">
+          <li class="menu-item menu-item-archives">
     <a href="/archives/" rel="section">
       <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
   </li>
@@ -305,140 +309,325 @@
           
             
 
-    
-    
-      
-      
-    
-      
-      
-    
-      
-      
-    
-      
-      
-    
-    
-
-  
-
-
           
           <div id="content" class="content">
             
 
+  <div id="posts" class="posts-expand">
+    
+
+  
+
   
   
   
-  <div class="post-block archive">
-    <div id="posts" class="posts-collapse">
-      <span class="archive-move-on"></span>
 
-      
-      <span class="archive-page-counter">
-        
-        
-        
-          
-        
-        Um..! 7 posts in total. Keep on posting.
-      </span>
-      
-
-      
-
-        
-        
-        
-
-        
-          
-          <div class="collection-title">
-            <h1 class="archive-year" id="archive-year-2018">2018</h1>
-          </div>
-        
-        
-
-        
+  
 
   <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://skysider.github.io/2017/04/20/about-heap/">
 
-      <h2 class="post-title">
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Skysider">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avator.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="skysider's blog">
+    </span>
+
+    
+      <header class="post-header">
+
         
-            <a class="post-title-link" href="/2018/05/12/Exim-off-by-one-漏洞利用/" itemprop="url">
-              
-                <span itemprop="name">Exim off-by-one 漏洞利用</span>
-              
-            </a>
         
-      </h2>
+          <h1 class="post-title" itemprop="name headline">About heap
+              
+            
+          </h1>
+        
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-05-12T01:18:59+08:00"
-              content="May 12, 2018" >
-          05-12
-        </time>
-      </div>
+        <div class="post-meta">
+          <span class="post-time">
 
-    </header>
-  </article>
+            
+            
+            
 
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
 
+              
+                
+              
+
+              <time title="Created: Apr 20, 2017 23:48:31" itemprop="dateCreated datePublished" datetime="2017-04-20T23:48:31+08:00">Apr 20, 2017</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: May 12, 2018 18:31:50" itemprop="dateModified" datetime="2018-05-12T18:31:50+08:00">May 12, 2018</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/exploit/" itemprop="url" rel="index"><span itemprop="name">exploit</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/04/20/about-heap/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/04/20/about-heap/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2018/05/11/2018redhat/" itemprop="url">
-              
-                <span itemprop="name">红帽杯2018部分writeup</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-05-11T01:05:15+08:00"
-              content="May 11, 2018" >
-          05-11
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
       
 
+      
+        <p>本文主要介绍ptmalloc3中关键的数据结构以及 <code>malloc</code>、<code>free</code>函数的执行过程。</p>
+<h4 id="malloc_state"><a href="#malloc-state" class="headerlink" title="malloc_state"></a>malloc_state</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">struct malloc_state &#123;</span><br><span class="line">    /* Serialize access.  */</span><br><span class="line">    mutex_t mutex;</span><br><span class="line"></span><br><span class="line">    /* Flags (formerly in max_fast). */</span><br><span class="line">    int flags;</span><br><span class="line"></span><br><span class="line">    #if THREAD_STATS</span><br><span class="line">        /* Statistics for locking. Only used if THREAD_STATS is defined. */</span><br><span class="line">        long stat_lock_direct, stat_lock_loop, stat_lock_wait;</span><br><span class="line">    #endif</span><br><span class="line"></span><br><span class="line">    /* Fastbins */</span><br><span class="line">    mfastbinptr fastbinsY[NFASTBINS];</span><br><span class="line"></span><br><span class="line">    /* Base of the topmost chunk -- not otherwise kept in a bin */</span><br><span class="line">    mchunkptr        top;</span><br><span class="line"></span><br><span class="line">    /* The remainder from the most recent split of a small request */</span><br><span class="line">    mchunkptr last_remainder;</span><br><span class="line"></span><br><span class="line">    /* Normal bins packed as described above */</span><br><span class="line">    mchunkptr        bins[NBINS * 2 - 2];</span><br><span class="line"></span><br><span class="line">    /* Bitmap of bins */</span><br><span class="line">    unsigned int binmap[BINMAPSIZE];</span><br><span class="line"></span><br><span class="line">    /* Linked list */</span><br><span class="line">    struct malloc_state *next;</span><br><span class="line"></span><br><span class="line">    #ifdef PER_THREAD</span><br><span class="line">        /* Linked list for free arenas. */</span><br><span class="line">        struct malloc_state *next_free;</span><br><span class="line">    #endif</span><br><span class="line"></span><br><span class="line">    /* Memory allocated from the system in this arena. */</span><br><span class="line">    INTERNAL_SIZE_T system_mem;</span><br><span class="line">    INTERNAL_SIZE_T max_system_mem;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<h4 id="heap_info"><a href="#heap-info" class="headerlink" title="heap_info"></a>heap_info</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">typedef struct _heap_info</span><br><span class="line">&#123;</span><br><span class="line">  mstate ar_ptr; /* Arena for this heap. */</span><br><span class="line">  struct _heap_info *prev; /* Previous heap. */</span><br><span class="line">  size_t size;   /* Current size in bytes. */</span><br><span class="line">  size_t mprotect_size; /* Size in bytes that has been mprotected</span><br><span class="line">   PROT_READ|PROT_WRITE.  */</span><br><span class="line">  /* Make sure the following data is properly aligned,</span><br><span class="line">   particularly that sizeof (heap_info) + 2 * SIZE_SZ is</span><br><span class="line">   a multiple of MALLOC_ALIGNMENT. */</span><br><span class="line">  char pad[-6 * SIZE_SZ &amp; MALLOC_ALIGN_MASK];</span><br><span class="line">&#125; heap_info;</span><br></pre></td></tr></table></figure>
+<h4 id="fastbin"><a href="#fastbin" class="headerlink" title="fastbin"></a>fastbin</h4><ul>
+<li>缓存small bin前7个</li>
+<li>单链表，LIFO 栈</li>
+<li>32bit:<ul>
+<li>范围 0x10-0x40 8字节依次递增  共7个</li>
+</ul>
+</li>
+<li>64bit:<ul>
+<li>范围 0x20-0x80 16字节依次递增 共7个</li>
+</ul>
+</li>
+<li>精确匹配</li>
+<li>libc中的全局变量<code>global_max_fast</code>定义了fast bins中chunk的最大值，<code>get_max_fast()</code>函数用于获取该值</li>
+</ul>
+<h4 id="bins"><a href="#bins" class="headerlink" title="bins"></a>bins</h4><ul>
+<li>共128，第0个和第127个不用，第1个为unsorted bin，接下来62个为small bin，后面63个为large bin</li>
+<li>每个bin使用双向循环链表管理空闲chunk，bin的链表头的指针fb指向第一个可用的chunk，指针bk指向最后一个可用的chunk，分别对应宏first(b)和last(b)</li>
+<li>small bins 共62个<ul>
+<li>双向链表，FIFO</li>
+<li>精确匹配</li>
+<li>32bit<ul>
+<li>范围 16-504B (&lt;0x200B)</li>
+</ul>
+</li>
+<li>64bit<ul>
+<li>范围 32-1008B(&lt; 0x400B)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>large bins共63个<ul>
+<li>分成6组，每组数量依次为32、16、8、4、2、1</li>
+<li>32bit<ul>
+<li>从0x200B开始，公差依次为0x40B、0x200B、0x1000B、3276B、262144B</li>
+</ul>
+</li>
+<li>64bit<ul>
+<li>从0x400B开始，公差依次为0x40B、0x200B、0x1000B、0x8000B</li>
+</ul>
+</li>
+<li>范围匹配</li>
+<li>每个bin中的chunk按照从大到小排列，同时一个chunk存在于两个双向链表中，一个链表包含了large bin中所有的chunk，另一个链表为chunk size链表，该链表从每个相同大小的chunk取出第一个chunk按照大小顺序链接在一起，便于一次跨域多个相同大小的chunk遍历下一个不同大小的chunk</li>
+</ul>
+</li>
+<li>unsorted bin，只有一个，位于bins表的第一个位置</li>
+</ul>
+<h4 id="top-chunk"><a href="#top-chunk" class="headerlink" title="top chunk"></a>top chunk</h4><ul>
+<li>只有一个，位于malloc_state结构中</li>
+</ul>
+<h4 id="last_remainder"><a href="#last-remainder" class="headerlink" title="last_remainder"></a>last_remainder</h4><ul>
+<li>一个，分配区上次分配small chunk时，从一个chunk中分裂出一个small chunk返回给用户，分裂后的剩余部分形成一个chunk，last_remainder就指向这个chunk</li>
+<li>每个bin使用双向循环链表管理空闲chunk，bin的链表头的指针fb指向第一个可用的chunk，指针bk指向最后一个可用的chunk，分别对应宏first(b)和last(b)</li>
+</ul>
+<h4 id="main_arena和-thread-arena"><a href="#main-arena和-thread-arena" class="headerlink" title="main_arena和 thread arena"></a>main_arena和 thread arena</h4><p><img src="https://i.loli.net/2018/05/12/5af6bda1e588a.png" alt="about_heap.png"></p>
+<h4 id="malloc"><a href="#malloc" class="headerlink" title="malloc"></a>malloc</h4><ol>
+<li>首先检测请求大小是否小于 <code>global_max_fast</code>时，如果满足且对应的fastbin非空，采用LIFO，移除对应的fastbin指向的free chunk （存在大小检查），返回；不满足，继续下一步</li>
+<li>检查请求大小是否满足<code>in_smallbin_range</code>（小于MIN_LARGE_SIZE），如果对应的small bin非空，移除bk指向的free chunk，即双向链表中的最后一个free chunk，设置下一个chunk的inuse标志位，返回；不满足，继续下一步</li>
+<li><p>反向遍历unsorted bin表中的free chunk</p>
+<ol>
+<li><p>如果需要分配small bin chunk，且unsorted bin中只有一个chunk，并且这个chunk为last_remainder_chunk且这个chunk的大小大于所需的chunk大小加上MINSIZE，如下所示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">if (in_smallbin_range(nb) &amp;&amp;</span><br><span class="line">    bck == unsorted_chunks(av) &amp;&amp;</span><br><span class="line">    victim == av-&gt;last_remainder &amp;&amp;</span><br><span class="line">    (unsigned long)(size) &gt;</span><br><span class="line">    (unsigned long)(nb + MINSIZE)) &#123;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>不满足以上条件，从unsorted bin中移除当前chunk，如果该chunk等于所需的chunk的大小，则返回</p>
+</li>
+<li>将当前chunk加到对应的small bin或者large bin表中</li>
+<li>如果分配的chunk为large bin chunk，遍历large bin表，找到合适的chunk</li>
+<li>如果通过上面的方式从最合适的 small bin 或 large bin 中都没有分配到需要的 chunk，则 查看比当前bin的index大的small bin或large bin是否有空闲chunk可利用来分配所需的 chunk</li>
+<li>尝试从top chunk中分配所需chunk</li>
+</ol>
+</li>
+</ol>
+<h4 id="free"><a href="#free" class="headerlink" title="free"></a>free</h4><ol>
+<li>首先检查大小是否小于 <code>get_max_fast()</code>，如果小于且检查下一个相邻堆块通过，则将当前堆块插到对应的fast bin表表头，返回；否则进入下一步</li>
+<li>检查当前块的前一个堆块是否空闲，如果空闲，则将它从bin表中删除（unlink），计算合并后的大小</li>
+<li>检查与当前块相邻的下一个chunk是不是top chunk，如果不是，检测是否处于inuse状态，若空闲，unlink</li>
+<li>将合并后的chunk加入unsorted bin 双向链表中</li>
+</ol>
+<h4 id="参考"><a href="#参考：" class="headerlink" title="参考："></a>参考：</h4><ul>
+<li><a href="https://sploitfun.wordpress.com/2015/02/10/understanding-glibc-malloc/" target="_blank" rel="noopener">https://sploitfun.wordpress.com/2015/02/10/understanding-glibc-malloc/</a></li>
+</ul>
+
+      
     </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>Skysider</li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="https://skysider.github.io/2017/04/20/about-heap/" title="About heap">https://skysider.github.io/2017/04/20/about-heap/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> unless stating additionally.</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/pwn/" rel="tag"># pwn</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/05/25/x86汇编——jump指令/" rel="prev" title="x86汇编——jmp指令">
+                x86汇编——jmp指令 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </div>
   
   
   
+  </article>
 
-  
 
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
           
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    </div>
+
+  
+
+
 
         </div>
         
@@ -459,8 +648,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -616,6 +814,22 @@
       </section>
 
       
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#malloc_state"><span class="nav-text">malloc_state</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#heap_info"><span class="nav-text">heap_info</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#fastbin"><span class="nav-text">fastbin</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#bins"><span class="nav-text">bins</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#top-chunk"><span class="nav-text">top chunk</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#last_remainder"><span class="nav-text">last_remainder</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#main_arena和-thread-arena"><span class="nav-text">main_arena和 thread arena</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#malloc"><span class="nav-text">malloc</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#free"><span class="nav-text">free</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#参考"><span class="nav-text">参考：</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
 
       
 
@@ -743,6 +957,10 @@
 
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.2.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.2.0"></script>
+
+
 
   
 
@@ -757,6 +975,23 @@
     <script id="dsq-count-scr" src="https://skysider.disqus.com/count.js" async></script>
   
 
+  
+    <script type="text/javascript">
+      var disqus_config = function () {
+        this.page.url = 'https://skysider.github.io/2017/04/20/about-heap/';
+        this.page.identifier = '2017/04/20/about-heap/';
+        this.page.title = 'About heap';
+      };
+      function loadComments () {
+        var d = document, s = d.createElement('script');
+        s.src = 'https://skysider.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      }
+      
+        loadComments();
+      
+    </script>
   
 
 

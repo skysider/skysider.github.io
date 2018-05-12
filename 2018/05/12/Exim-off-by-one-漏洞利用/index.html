@@ -125,7 +125,7 @@
 <meta property="og:image" content="https://i.loli.net/2018/05/12/5af5cd953d208.png">
 <meta property="og:image" content="https://i.loli.net/2018/05/12/5af5cd953d3c5.png">
 <meta property="og:image" content="https://i.loli.net/2018/05/12/5af5cee2c4e0d.png">
-<meta property="og:updated_time" content="2018-05-11T17:47:32.497Z">
+<meta property="og:updated_time" content="2018-05-12T10:32:27.456Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Exim off-by-one 漏洞利用">
 <meta name="twitter:description" content="2018年2月，流行的邮件服务器Exim曝出了堆溢出漏洞（CVE-2018-6789），几乎影响了之前的所有版本。该漏洞的发现者——台湾安全研究员Meh在博客上提供了利用该漏洞进行远程代码执行的思路，在推特中也表明了最终绕过各种缓解措施成功达成远程代码执行。  基于Meh的思路在特定环境下复现了漏洞利用的过程，最终达成远程命令执行，相关的漏洞环境和验证代码 （https://github.com/">
@@ -385,7 +385,7 @@
                 
               
 
-              <time title="Created: May 12, 2018 01:18:59 / Modified: 01:47:32" itemprop="dateCreated datePublished" datetime="2018-05-12T01:18:59+08:00">May 12, 2018</time>
+              <time title="Created: May 12, 2018 01:18:59 / Modified: 18:32:27" itemprop="dateCreated datePublished" datetime="2018-05-12T01:18:59+08:00">May 12, 2018</time>
             
 
             
@@ -454,7 +454,7 @@
       
         <p>2018年2月，流行的邮件服务器Exim曝出了堆溢出漏洞（CVE-2018-6789），几乎影响了之前的所有版本。该漏洞的发现者——台湾安全研究员Meh在博客上提供了利用该漏洞进行远程代码执行的思路，在推特中也表明了最终绕过各种缓解措施成功达成远程代码执行。</p>
 <p><img src="https://i.loli.net/2018/05/12/5af5cfacad3c5.png" alt="msg.png"></p>
-<p>基于Meh的思路在特定环境下复现了漏洞利用的过程，最终达成远程命令执行，相关的<a href="https://github.com/skysider/VulnPOC/tree/master/CVE-2018-6789" target="_blank" rel="noopener">漏洞环境和验证代码</a> （<a href="https://github.com/skysider/VulnPOC/tree/master/CVE-2018-6789）已公开。" target="_blank" rel="noopener">https://github.com/skysider/VulnPOC/tree/master/CVE-2018-6789）已公开。</a></p>
+<p>基于Meh的思路在特定环境下复现了漏洞利用的过程，最终达成远程命令执行，相关的<a href="https://github.com/skysider/VulnPOC/tree/master/CVE-2018-6789" target="_blank" rel="noopener">漏洞环境和验证代码</a> （<a href="https://github.com/skysider/VulnPOC/tree/master/CVE-2018-6789）已公开。" target="_blank" rel="noopener">https://github.com/skysider/VulnPOC/tree/master/CVE-2018-6789）已公开。</a><br><a id="more"></a></p>
 <h3 id="1-漏洞成因"><a href="#1-漏洞成因" class="headerlink" title="1. 漏洞成因"></a>1. 漏洞成因</h3><p>漏洞的成因是b64decode函数在对不规范的base64编码过的数据进行解码时可能会溢出堆上的一个字节，比较经典的off-by-one漏洞。</p>
 <p>存在漏洞的b64decode函数部分代码如下：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">b64decode(<span class="keyword">const</span> uschar *code, uschar **ptr)</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">int</span> x, y;</span><br><span class="line">uschar *result = store_get(<span class="number">3</span>*(Ustrlen(code)/<span class="number">4</span>) + <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">*ptr = result;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* Each cycle of the loop handles a quantum of 4 input bytes. For the last</span></span><br><span class="line"><span class="comment">quantum this may decode to 1, 2, or 3 output bytes. */</span></span><br><span class="line"> ......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -695,7 +695,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-count">7</span>
                     <span class="site-state-item-name">posts</span>
                   </a>
                 </div>
