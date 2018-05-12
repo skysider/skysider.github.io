@@ -102,19 +102,19 @@
 
 
 
-  <meta name="description" content="环境： MacOS（宿主机） android-studio(包含adb、monitor、jdb等工具) ida pro(包含android_server)     Android模拟器或手机(android） 待调试app    注意： 如果是模拟器进行调试，ro.debuggable默认为1，不需要二次打包 如果是真机进行调试，有2种比较方便的方法 对app进行二次打包，修改AndroidMan">
+  <meta name="description" content="环境： MacOS（宿主机） android-studio(包含adb、monitor、jdb等工具) ida pro(包含android_server)     Android模拟器或手机(android） 待调试app">
 <meta name="keywords" content="android,调试">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Mac下进行android so动态调试">
 <meta property="og:url" content="https://skysider.github.io/2017/05/07/mac-android-so-动态调试/index.html">
 <meta property="og:site_name" content="skysider&#39;s blog">
-<meta property="og:description" content="环境： MacOS（宿主机） android-studio(包含adb、monitor、jdb等工具) ida pro(包含android_server)     Android模拟器或手机(android） 待调试app    注意： 如果是模拟器进行调试，ro.debuggable默认为1，不需要二次打包 如果是真机进行调试，有2种比较方便的方法 对app进行二次打包，修改AndroidMan">
+<meta property="og:description" content="环境： MacOS（宿主机） android-studio(包含adb、monitor、jdb等工具) ida pro(包含android_server)     Android模拟器或手机(android） 待调试app">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://i.loli.net/2018/05/12/5af6ccf276286.png">
-<meta property="og:updated_time" content="2018-05-12T11:18:18.703Z">
+<meta property="og:updated_time" content="2018-05-12T11:33:29.203Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Mac下进行android so动态调试">
-<meta name="twitter:description" content="环境： MacOS（宿主机） android-studio(包含adb、monitor、jdb等工具) ida pro(包含android_server)     Android模拟器或手机(android） 待调试app    注意： 如果是模拟器进行调试，ro.debuggable默认为1，不需要二次打包 如果是真机进行调试，有2种比较方便的方法 对app进行二次打包，修改AndroidMan">
+<meta name="twitter:description" content="环境： MacOS（宿主机） android-studio(包含adb、monitor、jdb等工具) ida pro(包含android_server)     Android模拟器或手机(android） 待调试app">
 <meta name="twitter:image" content="https://i.loli.net/2018/05/12/5af6ccf276286.png">
 
 
@@ -388,7 +388,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: May 12, 2018 19:18:18" itemprop="dateModified" datetime="2018-05-12T19:18:18+08:00">May 12, 2018</time>
+                <time title="Modified: May 12, 2018 19:33:29" itemprop="dateModified" datetime="2018-05-12T19:33:29+08:00">May 12, 2018</time>
               
             
           </span>
@@ -463,6 +463,7 @@
 </ul>
 </li>
 </ul>
+<a id="more"></a>
 <h4 id="注意"><a href="#注意：" class="headerlink" title="注意："></a>注意：</h4><ol>
 <li>如果是模拟器进行调试，ro.debuggable默认为1，不需要二次打包</li>
 <li>如果是真机进行调试，有2种比较方便的方法<ul>
@@ -471,7 +472,6 @@
 </ul>
 </li>
 </ol>
-<a id="more"></a>
 <h3 id="运行"><a href="#运行：" class="headerlink" title="运行："></a>运行：</h3><h4 id="1-运行android_server默认开启23946端口"><a href="#1-运行android-server（默认开启23946端口）" class="headerlink" title="1.  运行android_server（默认开启23946端口）"></a>1.  运行android_server（默认开启23946端口）</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">adb push android_server /data/local/tmp/</span><br><span class="line">adb shell</span><br><span class="line">su</span><br><span class="line">chmod 777 /data/local/tmp/android_server</span><br><span class="line">/data/local/tmp/android_server</span><br></pre></td></tr></table></figure>
 <h4 id="2-以debug模式启动程序"><a href="#2-以debug模式启动程序" class="headerlink" title="2.  以debug模式启动程序"></a>2.  以debug模式启动程序</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">adb shell dumpsys activity top | head # 查看top activity信息，作为下面-n的参数</span><br><span class="line">adb shell am start -D -n com.yaotong.crackme/.MainActivity</span><br></pre></td></tr></table></figure>
 <h4 id="3-开启ddms"><a href="#3-开启ddms" class="headerlink" title="3. 开启ddms"></a>3. 开启ddms</h4><p>monitor，选中要调试的app（开启8700端口）</p>
