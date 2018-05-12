@@ -67,11 +67,11 @@
       <category term="ctf" scheme="https://skysider.github.io/categories/ctf/"/>
     
     
-      <category term="pwn" scheme="https://skysider.github.io/tags/pwn/"/>
-    
       <category term="ctf" scheme="https://skysider.github.io/tags/ctf/"/>
     
       <category term="redhat" scheme="https://skysider.github.io/tags/redhat/"/>
+    
+      <category term="pwn" scheme="https://skysider.github.io/tags/pwn/"/>
     
       <category term="reverse" scheme="https://skysider.github.io/tags/reverse/"/>
     
@@ -225,6 +225,31 @@
     
     
       <category term="pwn" scheme="https://skysider.github.io/tags/pwn/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>一个用于CTF PWN的docker容器</title>
+    <link href="https://skysider.github.io/2017/02/21/PwnDocker/"/>
+    <id>https://skysider.github.io/2017/02/21/PwnDocker/</id>
+    <published>2017-02-21T04:20:05.000Z</published>
+    <updated>2018-05-12T10:43:30.994Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="1-介绍"><a href="#1-介绍" class="headerlink" title="1. 介绍"></a>1. 介绍</h3><p>一个基于phusion/baseimage的docker容器，用于ctf中的Pwn类题目</p><h3 id="2-使用"><a href="#2-使用" class="headerlink" title="2. 使用"></a>2. 使用</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">docker run  -it \</span><br><span class="line">            --rm \</span><br><span class="line">            -h $&#123;ctf_name&#125; \</span><br><span class="line">            --name $&#123;ctf_name&#125; \</span><br><span class="line">            -v $(pwd)/$&#123;ctf_name&#125;:/ctf/work \</span><br><span class="line">            -p 23946:23946 \</span><br><span class="line">            --cap-add=SYS_PTRACE \</span><br><span class="line">            skysider/pwndocker</span><br></pre></td></tr></table></figure><a id="more"></a><h3 id="3-包含的软件"><a href="#3-包含的软件" class="headerlink" title="3. 包含的软件"></a>3. 包含的软件</h3><ul><li><a href="https://github.com/Gallopsled/pwntools" target="_blank" rel="noopener">pwntools</a>  —— CTF framework and exploit development library</li><li><a href="https://github.com/pwndbg/pwndbg" target="_blank" rel="noopener">pwndbg</a>  —— a GDB plug-in that makes debugging with GDB suck less, with a focus on features needed by low-level software developers, hardware hackers, reverse-engineers and exploit developers</li><li><a href="https://github.com/JonathanSalwan/ROPgadget" target="_blank" rel="noopener">ROPgadget</a>  —— facilitate ROP exploitation tool</li><li><a href="https://github.com/inaz2/roputils" target="_blank" rel="noopener">roputils</a>     —— A Return-oriented Programming toolkit</li><li><a href="https://github.com/david942j/one_gadget" target="_blank" rel="noopener">one_gadget</a> —— A searching one-gadget of execve(‘/bin/sh’, NULL, NULL) tool for amd64 and i386</li><li><a href="https://github.com/angr/angr" target="_blank" rel="noopener">angr</a>   ——  A platform-agnostic binary analysis framework</li><li><a href="https://github.com/radare/radare2" target="_blank" rel="noopener">radare2</a> ——  A rewrite from scratch of radare in order to provide a set of libraries and tools to work with binary files</li><li><a href="https://github.com/lieanu/LibcSearcher" target="_blank" rel="noopener">LibcSearcher</a> —— A libc search tool based on leaked function address</li><li>linux_server[64]     —— IDA 7.0 debug server for linux</li><li><a href="https://tmux.github.io/" target="_blank" rel="noopener">tmux</a>     —— a terminal multiplexer</li><li><a href="https://linux.die.net/man/1/ltrace" target="_blank" rel="noopener">ltrace</a>    —— trace library function call</li><li><a href="https://linux.die.net/man/1/strace" target="_blank" rel="noopener">strace</a> —— trace system call</li></ul>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;1-介绍&quot;&gt;&lt;a href=&quot;#1-介绍&quot; class=&quot;headerlink&quot; title=&quot;1. 介绍&quot;&gt;&lt;/a&gt;1. 介绍&lt;/h3&gt;&lt;p&gt;一个基于phusion/baseimage的docker容器，用于ctf中的Pwn类题目&lt;/p&gt;
+&lt;h3 id=&quot;2-使用&quot;&gt;&lt;a href=&quot;#2-使用&quot; class=&quot;headerlink&quot; title=&quot;2. 使用&quot;&gt;&lt;/a&gt;2. 使用&lt;/h3&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;5&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;6&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;7&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;8&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;docker run  -it \&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;            --rm \&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;            -h $&amp;#123;ctf_name&amp;#125; \&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;            --name $&amp;#123;ctf_name&amp;#125; \&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;            -v $(pwd)/$&amp;#123;ctf_name&amp;#125;:/ctf/work \&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;            -p 23946:23946 \&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;            --cap-add=SYS_PTRACE \&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;            skysider/pwndocker&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+    
+    </summary>
+    
+      <category term="ctf" scheme="https://skysider.github.io/categories/ctf/"/>
+    
+    
+      <category term="pwn" scheme="https://skysider.github.io/tags/pwn/"/>
+    
+      <category term="docker" scheme="https://skysider.github.io/tags/docker/"/>
     
   </entry>
   
