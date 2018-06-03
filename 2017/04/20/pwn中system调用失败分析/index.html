@@ -106,7 +106,7 @@
 <meta name="keywords" content="pwn,getshell">
 <meta property="og:type" content="article">
 <meta property="og:title" content="pwn中system调用失败分析">
-<meta property="og:url" content="https://skysider.github.io/2017/04/20/pwn中system调用失败分析/index.html">
+<meta property="og:url" content="http://www.skysider.top/2017/04/20/pwn中system调用失败分析/index.html">
 <meta property="og:site_name" content="skysider&#39;s blog">
 <meta property="og:description" content="在ctf比赛中，有时调试一个pwn题目，发现直到调用system函数、传参时都是对的，但是system函数会执行失败，就是无法拿到shell，在这里总结了一下可能的原因：  在调用system函数时，esp指针指向的区域前面不存在一定空间的可写数据区，原因是在函数执行过程中，会维护自己的栈帧(sub esp, xxxx) —— fake frame时需要注意，会触发__libc_sigaction">
 <meta property="og:locale" content="zh-Hans">
@@ -124,7 +124,7 @@
 
 
 
-  <link rel="canonical" href="https://skysider.github.io/2017/04/20/pwn中system调用失败分析/"/>
+  <link rel="canonical" href="http://www.skysider.top/2017/04/20/pwn中system调用失败分析/"/>
 
 
 
@@ -329,7 +329,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://skysider.github.io/2017/04/20/pwn中system调用失败分析/">
+    <link itemprop="mainEntityOfPage" href="http://www.skysider.top/2017/04/20/pwn中system调用失败分析/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Skysider">
@@ -483,7 +483,7 @@
     <strong>Post author:  </strong>Skysider</li>
   <li class="post-copyright-link">
     <strong>Post link: </strong>
-    <a href="https://skysider.github.io/2017/04/20/pwn中system调用失败分析/" title="pwn中system调用失败分析">https://skysider.github.io/2017/04/20/pwn中system调用失败分析/</a>
+    <a href="http://www.skysider.top/2017/04/20/pwn中system调用失败分析/" title="pwn中system调用失败分析">http://www.skysider.top/2017/04/20/pwn中system调用失败分析/</a>
   </li>
   <li class="post-copyright-license">
     <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> unless stating additionally.</li>
@@ -891,7 +891,7 @@
   
     <script type="text/javascript">
       var disqus_config = function () {
-        this.page.url = 'https://skysider.github.io/2017/04/20/pwn中system调用失败分析/';
+        this.page.url = 'http://www.skysider.top/2017/04/20/pwn中system调用失败分析/';
         this.page.identifier = '2017/04/20/pwn中system调用失败分析/';
         this.page.title = 'pwn中system调用失败分析';
       };
