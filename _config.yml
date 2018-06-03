@@ -76,5 +76,5 @@ search:
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
   type: git
-  repo: https://github.com/skysider/skysider.github.io
+  repo: git@github.com:skysider/skysider.github.io.git
   branch: master
