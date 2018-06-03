@@ -41,11 +41,11 @@
       <category term="ctf" scheme="http://www.skysider.top/categories/ctf/"/>
     
     
-      <category term="pwn" scheme="http://www.skysider.top/tags/pwn/"/>
-    
       <category term="ctf" scheme="http://www.skysider.top/tags/ctf/"/>
     
       <category term="redhat" scheme="http://www.skysider.top/tags/redhat/"/>
+    
+      <category term="pwn" scheme="http://www.skysider.top/tags/pwn/"/>
     
       <category term="reverse" scheme="http://www.skysider.top/tags/reverse/"/>
     
@@ -336,6 +336,34 @@
       <category term="pwn" scheme="http://www.skysider.top/tags/pwn/"/>
     
       <category term="docker" scheme="http://www.skysider.top/tags/docker/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>格式化串漏洞利用姿势</title>
+    <link href="http://www.skysider.top/2016/11/09/%E6%A0%BC%E5%BC%8F%E5%8C%96%E4%B8%B2%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%A7%BF%E5%8A%BF/"/>
+    <id>http://www.skysider.top/2016/11/09/格式化串漏洞利用姿势/</id>
+    <published>2016-11-09T14:55:35.000Z</published>
+    <updated>2018-06-03T15:01:56.698Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="确定偏移"><a href="#确定偏移" class="headerlink" title="确定偏移"></a>确定偏移</h3><ul><li>利用pwntools提供的FmtStr(exec_fmt)，获取offset</li></ul><h3 id="读写栈上数据"><a href="#读-写栈上数据" class="headerlink" title="读/写栈上数据"></a>读/写栈上数据</h3><ul><li>读：计算出要读的地址是第xxx个不定参数，然后利用%xxx$x 读取（x-十六进制读，lx长整读取（64位））</li><li>写：首先泄露栈上rbp的值，然后根据rbp与返回地址之间的差值，得出返回地址所在的栈地址，利用任意地址写即可覆盖返回地址，如下图所示，可泄露show函数栈帧中rbp1的值，然后利用rbp1与printf函数返回地址之间的差值，计算可到printf返回地址所在的地址，覆盖之（绕过FULL RELRO，泄露show函数的返回地址，可以绕过PIE，泄露main函数的返回地址，即__libc_start_main_ret，可以leak libc）</li></ul><h3 id="读写任意地址数据"><a href="#读-写任意地址数据" class="headerlink" title="读/写任意地址数据"></a>读/写任意地址数据</h3><ul><li><p>读：</p><ul><li>发送：payload = START + %xx$s + END+ addr</li><li><p>接收：</p><ol><li>recvuntil(START)<br>data = recvuntil(END, drop=1, timeout=1)<br>if not data:<pre><code>data = &apos;\\x00&apos;</code></pre></li></ol></li><li><p>读取addr地址处的字符串，xxx是根据addr在栈上的地址计算出的不定参数的值recvuntil(START)</p></li></ul></li><li>写：<ul><li>payload = %yyyc+%xxx$hn+[padding]+addr</li><li>xxx计算方法同上，yyy为要写入的数据，可以用fmtstr_payload(offset, writes)实现</li></ul></li></ul><p>DynELF时leak函数至少返回1字节，并且addr地址中可以出现\x00，</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;确定偏移&quot;&gt;&lt;a href=&quot;#确定偏移&quot; class=&quot;headerlink&quot; title=&quot;确定偏移&quot;&gt;&lt;/a&gt;确定偏移&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;利用pwntools提供的FmtStr(exec_fmt)，获取offset&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id
+      
+    
+    </summary>
+    
+      <category term="ctf" scheme="http://www.skysider.top/categories/ctf/"/>
+    
+    
+      <category term="pwn" scheme="http://www.skysider.top/tags/pwn/"/>
     
   </entry>
   
