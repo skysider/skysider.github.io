@@ -372,7 +372,7 @@
                 
               
 
-              <time title="Created: Jun 25, 2018 22:56:03 / Modified: 23:02:48" itemprop="dateCreated datePublished" datetime="2018-06-25T22:56:03+08:00">Jun 25, 2018</time>
+              <time title="Created: Jun 25, 2018 22:56:03 / Modified: 23:09:00" itemprop="dateCreated datePublished" datetime="2018-06-25T22:56:03+08:00">Jun 25, 2018</time>
             
 
             
@@ -440,9 +440,11 @@
 
       
         
-          
-          house of orange in glibc 2.24house of orang 基本原理：覆盖unsorted bin空闲块，修改其大小为0x61(small bin [4])，修改bk指向 _IO_list_all-0x10，同时布置fake file struct，然后分配堆块，触发un
-          ...
+          <h1 id="house-of-orange-in-glibc-2-24"><a href="#house-of-orange-in-glibc-2-24" class="headerlink" title="house of orange in glibc 2.24"></a>house of orange in glibc 2.24</h1><h3 id="house-of-orang-基本原理："><a href="#house-of-orang-基本原理：" class="headerlink" title="house of orang 基本原理："></a>house of orang 基本原理：</h3><p>覆盖unsorted bin空闲块，修改其大小为0x61(small bin [4])，修改bk指向 <code>_IO_list_all</code>-0x10，同时布置fake file struct，然后分配堆块，触发unsorted bin attack 修改 <code>_IO_list_all</code>，将修改过的unsorted bin 放入 small bin 4中，继续遍历unsorted bin会触发异常，调用 <code>malloc_printerr</code>，该函数调用栈如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">malloc_printerr</span><br><span class="line">   _libc_message(error msg)</span><br><span class="line">       abort</span><br><span class="line">           _IO_flush_all_lockp -&gt; JUMP_FILE(_IO_OVERFLOW)</span><br></pre></td></tr></table></figure>
+<p>如果能够伪造 <code>_IO_OVERFLOW</code> 函数，便可以get shell。</p>
+<p>在调用<code>_IO_OVERFLOW</code> 之前，会做一些检查</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">0841</span>       <span class="keyword">if</span> (((fp-&gt;_mode &lt;= <span class="number">0</span> &amp;&amp; fp-&gt;_IO_write_ptr &gt; fp-&gt;_IO_write_base)</span><br><span class="line"><span class="number">0842</span> #<span class="keyword">if</span> defined _LIBC || defined _GLIBCPP_USE_WCHAR_T</span><br><span class="line"><span class="number">0843</span>        || (_IO_vtable_offset (fp) == <span class="number">0</span></span><br><span class="line"><span class="number">0844</span>            &amp;&amp; fp-&gt;_mode &gt; <span class="number">0</span> &amp;&amp; (fp-&gt;_wide_data-&gt;_IO_write_ptr</span><br><span class="line"><span class="number">0845</span>                     &gt; fp-&gt;_wide_data-&gt;_IO_write_base))</span><br><span class="line"><span class="number">0846</span> #endif</span><br><span class="line"><span class="number">0847</span>        )</span><br><span class="line"><span class="number">0848</span>       &amp;&amp; _IO_OVERFLOW (fp, EOF) == EOF)</span><br></pre></td></tr></table></figure>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2018/06/25/house-of-orange-in-glibc-2-24/#more" rel="contents">

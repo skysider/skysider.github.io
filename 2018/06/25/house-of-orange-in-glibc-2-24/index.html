@@ -111,7 +111,7 @@
 <meta property="og:description" content="house of orange in glibc 2.24house of orang 基本原理：覆盖unsorted bin空闲块，修改其大小为0x61(small bin [4])，修改bk指向 _IO_list_all-0x10，同时布置fake file struct，然后分配堆块，触发unsorted bin attack 修改 _IO_list_all，将修改过的unsorted bi">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://i.loli.net/2018/06/25/5b31033386f7b.png">
-<meta property="og:updated_time" content="2018-06-25T15:02:48.631Z">
+<meta property="og:updated_time" content="2018-06-25T15:09:00.020Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="house of orange in glibc 2.24">
 <meta name="twitter:description" content="house of orange in glibc 2.24house of orang 基本原理：覆盖unsorted bin空闲块，修改其大小为0x61(small bin [4])，修改bk指向 _IO_list_all-0x10，同时布置fake file struct，然后分配堆块，触发unsorted bin attack 修改 _IO_list_all，将修改过的unsorted bi">
@@ -371,7 +371,7 @@
                 
               
 
-              <time title="Created: Jun 25, 2018 22:56:03 / Modified: 23:02:48" itemprop="dateCreated datePublished" datetime="2018-06-25T22:56:03+08:00">Jun 25, 2018</time>
+              <time title="Created: Jun 25, 2018 22:56:03 / Modified: 23:09:00" itemprop="dateCreated datePublished" datetime="2018-06-25T22:56:03+08:00">Jun 25, 2018</time>
             
 
             
@@ -443,6 +443,7 @@
 <p>如果能够伪造 <code>_IO_OVERFLOW</code> 函数，便可以get shell。</p>
 <p>在调用<code>_IO_OVERFLOW</code> 之前，会做一些检查</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">0841</span>       <span class="keyword">if</span> (((fp-&gt;_mode &lt;= <span class="number">0</span> &amp;&amp; fp-&gt;_IO_write_ptr &gt; fp-&gt;_IO_write_base)</span><br><span class="line"><span class="number">0842</span> #<span class="keyword">if</span> defined _LIBC || defined _GLIBCPP_USE_WCHAR_T</span><br><span class="line"><span class="number">0843</span>        || (_IO_vtable_offset (fp) == <span class="number">0</span></span><br><span class="line"><span class="number">0844</span>            &amp;&amp; fp-&gt;_mode &gt; <span class="number">0</span> &amp;&amp; (fp-&gt;_wide_data-&gt;_IO_write_ptr</span><br><span class="line"><span class="number">0845</span>                     &gt; fp-&gt;_wide_data-&gt;_IO_write_base))</span><br><span class="line"><span class="number">0846</span> #endif</span><br><span class="line"><span class="number">0847</span>        )</span><br><span class="line"><span class="number">0848</span>       &amp;&amp; _IO_OVERFLOW (fp, EOF) == EOF)</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
 <p>要绕过这些检查，可以伪造：</p>
 <ol>
 <li><code>fp-&gt;_mode = 0</code></li>
@@ -474,9 +475,9 @@
 <p>程序存在一个leak的洞和一个 offset by one null byte的漏洞，</p>
 <p><img src="https://i.loli.net/2018/06/25/5b31033386f7b.png" alt="bufoverflow_a.png"></p>
 <p>利用leak可以泄露libc的地址，利用offset by one null byte 可以构造 chunk overlap，从而可以修改unsorted bin，实施 house of orange 攻击。</p>
-<p>poc 见 <a href="https://xz.aliyun.com/t/2405#toc-16，它利用了`__IO_str_jumps`" target="_blank" rel="noopener">https://xz.aliyun.com/t/2405#toc-16，它利用了`__IO_str_jumps`</a> 的 <code>_IO_str_overflow</code> 函数，将 fp+0xe0 修改为 one_gadget 地址。</p>
+<p>poc 见 <a href="https://xz.aliyun.com/t/2405#toc-16" target="_blank" rel="noopener">De1ta’s poc</a>，它利用了<code>__IO_str_jumps</code> 的 <code>_IO_str_overflow</code> 函数，将 fp+0xe0 修改为 one_gadget 地址。</p>
 <h3 id="其他绕过vtable-check的方法"><a href="#其他绕过vtable-check的方法" class="headerlink" title="其他绕过vtable check的方法"></a>其他绕过vtable check的方法</h3><p>绕过glibc 2.24 vtable check的方法不只有house of orange，我们可以利用 unsorted bin attack 去改写file结构体中的某些成员，比如<code>_IO_2_1_stdin_</code> 中的 <code>_IO_buf_end</code>，这样在 <code>_IO_buf_base</code> 和<code>_IO_buf_end</code>(<code>main_arena+0x58</code>) 存在 <code>__malloc_hook</code>，可以利用scanf函数读取数据填充到该区域，注意不要破坏已有数据。 </p>
-<p>例题见 SCTF 2018 bufoverflow_a 的官方wp <a href="https://www.xctf.org.cn/library/details/242b5bc84314a983ee39d5bb5aab5243c875e3fc/" target="_blank" rel="noopener">https://www.xctf.org.cn/library/details/242b5bc84314a983ee39d5bb5aab5243c875e3fc/</a></p>
+<p>详细的利用方法见 SCTF 2018 bufoverflow_a 的<a href="https://www.xctf.org.cn/library/details/242b5bc84314a983ee39d5bb5aab5243c875e3fc/" target="_blank" rel="noopener">官方wp</a> 。</p>
 
       
     </div>
