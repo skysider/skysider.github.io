@@ -111,7 +111,7 @@
 <meta property="og:description" content="house of orange in glibc 2.24house of orang 基本原理：覆盖unsorted bin空闲块，修改其大小为0x61(small bin [4])，修改bk指向 _IO_list_all-0x10，同时布置fake file struct，然后分配堆块，触发unsorted bin attack 修改 _IO_list_all，将修改过的unsorted bi">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://i.loli.net/2018/06/25/5b31033386f7b.png">
-<meta property="og:updated_time" content="2018-06-25T15:09:00.020Z">
+<meta property="og:updated_time" content="2018-06-26T14:58:05.456Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="house of orange in glibc 2.24">
 <meta name="twitter:description" content="house of orange in glibc 2.24house of orang 基本原理：覆盖unsorted bin空闲块，修改其大小为0x61(small bin [4])，修改bk指向 _IO_list_all-0x10，同时布置fake file struct，然后分配堆块，触发unsorted bin attack 修改 _IO_list_all，将修改过的unsorted bi">
@@ -371,12 +371,24 @@
                 
               
 
-              <time title="Created: Jun 25, 2018 22:56:03 / Modified: 23:09:00" itemprop="dateCreated datePublished" datetime="2018-06-25T22:56:03+08:00">Jun 25, 2018</time>
+              <time title="Created: Jun 25, 2018 22:56:03" itemprop="dateCreated datePublished" datetime="2018-06-25T22:56:03+08:00">Jun 25, 2018</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: Jun 26, 2018 22:58:05" itemprop="dateModified" datetime="2018-06-26T22:58:05+08:00">Jun 26, 2018</time>
               
             
           </span>
@@ -448,8 +460,8 @@
 <ol>
 <li><code>fp-&gt;_mode = 0</code></li>
 <li><code>fp-&gt;_IO_write_ptr</code> &lt; <code>fp-&gt;_IO_write_base</code></li>
-<li><code>fp-&gt;_IO_read_ptr</code> = 0x61, smallbin4 + 8 (smallbin size)</li>
-<li><code>fp-&gt;_IO_read_base</code> = <code>_IO_list_all</code> - 0x10, smallbin -&gt; bk, unsorted bin attack </li>
+<li><code>fp-&gt;_IO_read_ptr = 0x61</code> , smallbin4 + 8 (smallbin size)</li>
+<li><code>fp-&gt;_IO_read_base</code> = <code>_IO_list_all - 0x10</code>, smallbin -&gt; bk, unsorted bin attack </li>
 </ol>
 <p>Glib 2.23 之前可以伪造<code>vtable</code> , 使得<code>_IO_OVERFLOW</code> = <code>system</code> ，将fp指向的内容开始的字符串布置为 “sh”即可。</p>
 <h3 id="glibc-224引入的新机制"><a href="#GLIBC-2-24引入的新机制" class="headerlink" title="GLIBC 2.24引入的新机制"></a>GLIBC 2.24引入的新机制</h3><p>2.24开始引入<code>vtable</code> 的检测函数—— <code>IO_validate_vtable</code>，该函数定义如下：</p>
@@ -464,13 +476,19 @@
 <ol>
 <li><code>fp-&gt;_mode = 0</code></li>
 <li><code>fp-&gt;_IO_write_ptr</code> &lt; <code>fp-&gt;_IO_write_base</code></li>
-<li><code>fp-&gt;_IO_read_ptr</code> = 0x61, smallbin4 + 8 (smallbin size)</li>
-<li><code>fp-&gt;_IO_read_base</code> = <code>_IO_list_all</code> - 0x10, smallbin -&gt; bk, unsorted bin attack （以上为绕过<code>_IO_flush_all_lockp</code>的条件）</li>
-<li><code>vtable</code> = <code>_IO_str_jumps</code> - 8，这样调用<code>_IO_overflow</code>时会调用到 <code>_IO_str_finish</code></li>
-<li><code>fp-&gt;_flags</code> = 0</li>
+<li><code>fp-&gt;_IO_read_ptr = 0x61</code> , smallbin4 + 8 (smallbin size)</li>
+<li><code>fp-&gt;_IO_read_base</code> = <code>_IO_list_all -0x10</code> , smallbin -&gt; bk, unsorted bin attack （以上为绕过<code>_IO_flush_all_lockp</code>的条件）</li>
+<li><code>vtable</code> = <code>_IO_str_jumps - 8</code> ，这样调用<code>_IO_overflow</code>时会调用到 <code>_IO_str_finish</code></li>
+<li><code>fp-&gt;_flags= 0</code> </li>
 <li><code>fp-&gt;_IO_buf_base</code> = <code>binsh_addr</code></li>
 <li><code>fp+0xe8</code> = <code>system_addr</code></li>
 </ol>
+<h4 id="如何定位_io_str_jumps"><a href="#如何定位-IO-str-jumps" class="headerlink" title="如何定位_IO_str_jumps"></a>如何定位<code>_IO_str_jumps</code></h4><p>由于·<code>_IO_str_jumps</code> 不是导出符号，因此无法直接利用pwntools的<code>libc.sym[&quot;_IO_str_jumps&quot;]</code> 直接进行定位，我们可以转换一下思路，利用 <code>_IO_str_jumps</code>表中的导出函数，例如 <code>_IO_str_underflow</code> 进行辅助定位，我们可以利用gdb去查找所有包含这个<code>_IO_str_underflow</code> 函数地址的内存地址，如下所示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; p _IO_str_underflow</span><br><span class="line">$1 = &#123;&lt;text variable, no debug info&gt;&#125; 0x7f4d4cf04790 &lt;_IO_str_underflow&gt;</span><br><span class="line">pwndbg&gt; search -p 0x7f4d4cf04790</span><br><span class="line">libc.so.6       0x7f4d4d2240a0 0x7f4d4cf04790</span><br><span class="line">libc.so.6       0x7f4d4d224160 0x7f4d4cf04790</span><br><span class="line">libc.so.6       0x7f4d4d2245e0 0x7f4d4cf04790</span><br><span class="line">pwndbg&gt; p &amp;_IO_file_jumps</span><br><span class="line">$2 = (&lt;data variable, no debug info&gt; *) 0x7f4d4d224440 &lt;_IO_file_jumps&gt;</span><br></pre></td></tr></table></figure>
+<p>再利用 <code>_IO_str_jumps</code> 的地址大于 <code>_IO_file_jumps</code> 地址的条件，就可以锁定最后一个地址为符合条件的 <code>_IO_str_jumps</code> 的地址，由于 <code>_IO_str_underflow</code> 在<code>_IO_str_jumps</code> 的偏移为0x20，我们可以计算出<code>_IO_str_jumps</code> = 0x7f4d4d2245c0，再减掉libc的基地址，就可以得到<code>_IO_str_jumps</code> 的正确偏移。</p>
+<p>当然也可以用IDA Pro分析libc.so，查找<code>_IO_file_jumps</code> 后的jump表即可。</p>
+<p>此外，介绍一种直接利用pwntools得到<code>_IO_str_jumps</code> 偏移的方法，思想与采用动态调试分析的方法类似，直接放代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">IO_file_jumps_offset = libc.sym[<span class="string">'_IO_file_jumps'</span>]</span><br><span class="line">IO_str_underflow_offset = libc.sym[<span class="string">'_IO_str_underflow'</span>]</span><br><span class="line"><span class="keyword">for</span> ref_offset <span class="keyword">in</span> libc.search(p64(IO_str_underflow_offset)):</span><br><span class="line">    possible_IO_str_jumps_offset = ref_offset - <span class="number">0x20</span></span><br><span class="line">    <span class="keyword">if</span> possible_IO_str_jumps_offset &gt; IO_file_jumps_offset:</span><br><span class="line">        <span class="keyword">print</span> possible_IO_str_jumps_offset</span><br><span class="line">        <span class="keyword">break</span></span><br></pre></td></tr></table></figure>
 <h4 id="实战"><a href="#实战" class="headerlink" title="实战"></a>实战</h4><p>以 SCTF 2018 bufoverflow_a 为例，来说明如何利用 <code>_IO_str_jumps</code> 来get shell</p>
 <p>程序存在一个leak的洞和一个 offset by one null byte的漏洞，</p>
 <p><img src="https://i.loli.net/2018/06/25/5b31033386f7b.png" alt="bufoverflow_a.png"></p>
@@ -779,7 +797,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#house-of-orange-in-glibc-224"><span class="nav-text">house of orange in glibc 2.24</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#house-of-orang-基本原理"><span class="nav-text">house of orang 基本原理：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#glibc-224引入的新机制"><span class="nav-text">GLIBC 2.24引入的新机制</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#利用__io_str_jumps-绕过"><span class="nav-text">利用__IO_str_jumps 绕过</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#实战"><span class="nav-text">实战</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其他绕过vtable-check的方法"><span class="nav-text">其他绕过vtable check的方法</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#house-of-orange-in-glibc-224"><span class="nav-text">house of orange in glibc 2.24</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#house-of-orang-基本原理"><span class="nav-text">house of orang 基本原理：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#glibc-224引入的新机制"><span class="nav-text">GLIBC 2.24引入的新机制</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#利用__io_str_jumps-绕过"><span class="nav-text">利用__IO_str_jumps 绕过</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#如何定位_io_str_jumps"><span class="nav-text">如何定位_IO_str_jumps</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#实战"><span class="nav-text">实战</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其他绕过vtable-check的方法"><span class="nav-text">其他绕过vtable check的方法</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>
