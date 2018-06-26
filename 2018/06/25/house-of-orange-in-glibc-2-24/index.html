@@ -102,19 +102,19 @@
 
 
 
-  <meta name="description" content="house of orange in glibc 2.24house of orang 基本原理：覆盖unsorted bin空闲块，修改其大小为0x61(small bin [4])，修改bk指向 _IO_list_all-0x10，同时布置fake file struct，然后分配堆块，触发unsorted bin attack 修改 _IO_list_all，将修改过的unsorted bi">
+  <meta name="description" content="house of orang 基本原理：覆盖unsorted bin空闲块，修改其大小为0x61(small bin [4])，修改bk指向 _IO_list_all-0x10，同时布置fake file struct，然后分配堆块，触发unsorted bin attack 修改 _IO_list_all，将修改过的unsorted bin 放入 small bin 4中，继续遍历unsorte">
 <meta name="keywords" content="pwn,file">
 <meta property="og:type" content="article">
 <meta property="og:title" content="house of orange in glibc 2.24">
 <meta property="og:url" content="http://www.skysider.top/2018/06/25/house-of-orange-in-glibc-2-24/index.html">
 <meta property="og:site_name" content="skysider&#39;s blog">
-<meta property="og:description" content="house of orange in glibc 2.24house of orang 基本原理：覆盖unsorted bin空闲块，修改其大小为0x61(small bin [4])，修改bk指向 _IO_list_all-0x10，同时布置fake file struct，然后分配堆块，触发unsorted bin attack 修改 _IO_list_all，将修改过的unsorted bi">
+<meta property="og:description" content="house of orang 基本原理：覆盖unsorted bin空闲块，修改其大小为0x61(small bin [4])，修改bk指向 _IO_list_all-0x10，同时布置fake file struct，然后分配堆块，触发unsorted bin attack 修改 _IO_list_all，将修改过的unsorted bin 放入 small bin 4中，继续遍历unsorte">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://i.loli.net/2018/06/25/5b31033386f7b.png">
-<meta property="og:updated_time" content="2018-06-26T14:58:05.456Z">
+<meta property="og:updated_time" content="2018-06-26T15:01:12.876Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="house of orange in glibc 2.24">
-<meta name="twitter:description" content="house of orange in glibc 2.24house of orang 基本原理：覆盖unsorted bin空闲块，修改其大小为0x61(small bin [4])，修改bk指向 _IO_list_all-0x10，同时布置fake file struct，然后分配堆块，触发unsorted bin attack 修改 _IO_list_all，将修改过的unsorted bi">
+<meta name="twitter:description" content="house of orang 基本原理：覆盖unsorted bin空闲块，修改其大小为0x61(small bin [4])，修改bk指向 _IO_list_all-0x10，同时布置fake file struct，然后分配堆块，触发unsorted bin attack 修改 _IO_list_all，将修改过的unsorted bin 放入 small bin 4中，继续遍历unsorte">
 <meta name="twitter:image" content="https://i.loli.net/2018/06/25/5b31033386f7b.png">
 
 
@@ -388,7 +388,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: Jun 26, 2018 22:58:05" itemprop="dateModified" datetime="2018-06-26T22:58:05+08:00">Jun 26, 2018</time>
+                <time title="Modified: Jun 26, 2018 23:01:12" itemprop="dateModified" datetime="2018-06-26T23:01:12+08:00">Jun 26, 2018</time>
               
             
           </span>
@@ -450,7 +450,7 @@
       
 
       
-        <h1 id="house-of-orange-in-glibc-224"><a href="#house-of-orange-in-glibc-2-24" class="headerlink" title="house of orange in glibc 2.24"></a>house of orange in glibc 2.24</h1><h3 id="house-of-orang-基本原理"><a href="#house-of-orang-基本原理：" class="headerlink" title="house of orang 基本原理："></a>house of orang 基本原理：</h3><p>覆盖unsorted bin空闲块，修改其大小为0x61(small bin [4])，修改bk指向 <code>_IO_list_all</code>-0x10，同时布置fake file struct，然后分配堆块，触发unsorted bin attack 修改 <code>_IO_list_all</code>，将修改过的unsorted bin 放入 small bin 4中，继续遍历unsorted bin会触发异常，调用 <code>malloc_printerr</code>，该函数调用栈如下：</p>
+        <h3 id="house-of-orang-基本原理"><a href="#house-of-orang-基本原理：" class="headerlink" title="house of orang 基本原理："></a>house of orang 基本原理：</h3><p>覆盖unsorted bin空闲块，修改其大小为0x61(small bin [4])，修改bk指向 <code>_IO_list_all</code>-0x10，同时布置fake file struct，然后分配堆块，触发unsorted bin attack 修改 <code>_IO_list_all</code>，将修改过的unsorted bin 放入 small bin 4中，继续遍历unsorted bin会触发异常，调用 <code>malloc_printerr</code>，该函数调用栈如下：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">malloc_printerr</span><br><span class="line">   _libc_message(error msg)</span><br><span class="line">       abort</span><br><span class="line">           _IO_flush_all_lockp -&gt; JUMP_FILE(_IO_OVERFLOW)</span><br></pre></td></tr></table></figure>
 <p>如果能够伪造 <code>_IO_OVERFLOW</code> 函数，便可以get shell。</p>
 <p>在调用<code>_IO_OVERFLOW</code> 之前，会做一些检查</p>
@@ -797,7 +797,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#house-of-orange-in-glibc-224"><span class="nav-text">house of orange in glibc 2.24</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#house-of-orang-基本原理"><span class="nav-text">house of orang 基本原理：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#glibc-224引入的新机制"><span class="nav-text">GLIBC 2.24引入的新机制</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#利用__io_str_jumps-绕过"><span class="nav-text">利用__IO_str_jumps 绕过</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#如何定位_io_str_jumps"><span class="nav-text">如何定位_IO_str_jumps</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#实战"><span class="nav-text">实战</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其他绕过vtable-check的方法"><span class="nav-text">其他绕过vtable check的方法</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#house-of-orang-基本原理"><span class="nav-text">house of orang 基本原理：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#glibc-224引入的新机制"><span class="nav-text">GLIBC 2.24引入的新机制</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#利用__io_str_jumps-绕过"><span class="nav-text">利用__IO_str_jumps 绕过</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#如何定位_io_str_jumps"><span class="nav-text">如何定位_IO_str_jumps</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#实战"><span class="nav-text">实战</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其他绕过vtable-check的方法"><span class="nav-text">其他绕过vtable check的方法</span></a></li></ol></div>
             
 
           </div>
