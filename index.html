@@ -770,7 +770,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: Jun 25, 2018 22:55:13" itemprop="dateModified" datetime="2018-06-25T22:55:13+08:00">Jun 25, 2018</time>
+                <time title="Modified: Aug 25, 2018 09:29:26" itemprop="dateModified" datetime="2018-08-25T09:29:26+08:00">Aug 25, 2018</time>
               
             
           </span>
@@ -824,7 +824,8 @@
 <li><code>environ</code>指向的地址 -30*size 为 <code>main</code>函数的返回地址的栈地址</li>
 <li>申请分配large chunk时，会进行 <code>malloc_consolidate</code>，清空<code>fastbins</code>表，进行合并</li>
 <li><code>scanf</code>, <code>printf</code>当输入、输出过长时，会调用<code>malloc</code>、<code>free</code></li>
-<li>addr(<code>main_arena</code>)-0x10 = addr(<code>__malloc_hook</code>)
+<li>addr(<code>main_arena</code>)-0x10 = addr(<code>__malloc_hook</code>)</li>
+<li>unsorted bin泄露libc，libc_addr = leak_addr - 0x68 - libc.sym[‘__malloc_hook’]
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2018/04/24/heap-exploit-tips/#more" rel="contents">
