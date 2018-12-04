@@ -770,7 +770,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: Aug 25, 2018 09:29:26" itemprop="dateModified" datetime="2018-08-25T09:29:26+08:00">Aug 25, 2018</time>
+                <time title="Modified: Dec 4, 2018 14:35:49" itemprop="dateModified" datetime="2018-12-04T14:35:49+08:00">Dec 4, 2018</time>
               
             
           </span>
@@ -821,11 +821,19 @@
       
         
           <h3 id="1-common-tips"><a href="#1-common-tips" class="headerlink" title="1. common tips:"></a>1. common tips:</h3><ul>
-<li><code>environ</code>指向的地址 -30*size 为 <code>main</code>函数的返回地址的栈地址</li>
-<li>申请分配large chunk时，会进行 <code>malloc_consolidate</code>，清空<code>fastbins</code>表，进行合并</li>
-<li><code>scanf</code>, <code>printf</code>当输入、输出过长时，会调用<code>malloc</code>、<code>free</code></li>
-<li>addr(<code>main_arena</code>)-0x10 = addr(<code>__malloc_hook</code>)</li>
-<li>unsorted bin泄露libc，libc_addr = leak_addr - 0x68 - libc.sym[‘__malloc_hook’]
+<li><p><code>environ</code>指向的地址 -30*size 为 <code>main</code>函数的返回地址的栈地址</p>
+</li>
+<li><p>申请分配large chunk时，会进行 <code>malloc_consolidate</code>，清空<code>fastbins</code>表，进行合并</p>
+</li>
+<li><p><code>scanf</code>, <code>printf</code>当输入、输出过长时，会调用<code>malloc</code>、<code>free</code></p>
+</li>
+<li><p>addr(<code>main_arena</code>)-0x10 = addr(<code>__malloc_hook</code>)</p>
+</li>
+<li><p>unsorted bin泄露libc</p>
+<ul>
+<li><p>64bit: <code>libc_addr</code> = <code>leak_addr</code> - <code>0x68</code> - <code>libc.sym[&#39;__malloc_hook&#39;]</code></p>
+</li>
+<li><p>32bit: <code>libc_addr</code> = <code>leak_addr</code> - <code>0x48</code> - <code>libc.sym[&#39;__malloc_hook&#39;]</code></p>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2018/04/24/heap-exploit-tips/#more" rel="contents">
